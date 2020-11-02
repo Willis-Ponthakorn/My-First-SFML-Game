@@ -4,14 +4,17 @@
 void Game::initVariables()
 {
 	this->window = nullptr;
+	this->fullscreen = false;
+	this->dt = 0.f;
 }
 
 void Game::initWindow()
 {
 	std::ifstream ifs("Config/window.ini");
+	this->videoModes = sf::VideoMode::getFullscreenModes();
 
 	std::string title = "None";
-	sf::VideoMode window_bounds(1080, 720);
+	sf::VideoMode window_bounds = sf::VideoMode::getDesktopMode();
 	unsigned framerate_limit = 120;
 	bool vertical_sync_enabled = false;
 
@@ -25,7 +28,8 @@ void Game::initWindow()
 
 	ifs.close();
 
-	this->window = new sf::RenderWindow(window_bounds, title, sf::Style::Close | sf::Style::Titlebar);
+	this->window = new sf::RenderWindow(window_bounds, title, sf::Style::Titlebar | sf::Style::Close, windowSettings);
+
 	this->window->setFramerateLimit(framerate_limit);
 	this->window->setVerticalSyncEnabled(vertical_sync_enabled);
 }
