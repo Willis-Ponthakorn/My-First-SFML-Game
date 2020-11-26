@@ -15,7 +15,7 @@ public:
     Player(float x, float y, sf::Texture& texture_sheet);
     virtual ~Player();
 
-
+    virtual void update(const float& dt);
 };
 
 #endif

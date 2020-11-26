@@ -22,7 +22,7 @@ void GameState::initKeybinds()
 
 void GameState::initTexture()
 {
-	if (!this->textures["Player_IDLE"].loadFromFile("res/image/mainCharacterResize.png"))
+	if (!this->textures["PLAYER_SHEET"].loadFromFile("res/image/mainCharacter_IDLE_RIGHT.png"))
 	{
 		throw "ERROR::GAMESTATE::COULD_NOT_LOAD_PLAYER_TEXTURE";
 	}
@@ -30,7 +30,7 @@ void GameState::initTexture()
 
 void GameState::initPlayer()
 {
-	this->player = new Player(0, 600, this->textures["Player_IDLE"]);
+	this->player = new Player(0, 600, this->textures["PLAYER_SHEET"]);
 }
 
 GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states)

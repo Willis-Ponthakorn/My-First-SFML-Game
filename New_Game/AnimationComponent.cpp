@@ -8,13 +8,14 @@ AnimationComponent::AnimationComponent(sf::Sprite& sprite, sf::Texture& texture_
 
 AnimationComponent::~AnimationComponent()
 {
-	for (auto& i : this->animations)
+	for (auto &i : this->animations)
 	{
 		delete i.second;
 	}
 }
 
-void AnimationComponent::addAnimation(const std::string key,
+void AnimationComponent::addAnimation(
+	const std::string key,
 	float animation_timer,
 	int start_frame_x, int start_frame_y, int frames_x, int frames_y, int width, int height)
 {
