@@ -16,6 +16,7 @@ Player::Player(float x, float y, sf::Texture& texture_sheet)
 	
 	this->setPosition(x, y);
 
+	this->createHitboxComponent(this->sprite, 0.f, 0.f, 32.f, 36.f);
 	this->createMovementComponent(400.f, 100.f, 50.f);
 	this->createAnimationComponent(texture_sheet);
 
@@ -36,4 +37,6 @@ void Player::update(const float& dt)
 		this->animationComponent->play("IDLE", dt);
 	else if(this->movementComponent->getState(MOVING))
 		this->animationComponent->play("MOVING", dt);
+
+	this->hitboxComponent->update();
 }
