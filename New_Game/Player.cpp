@@ -34,7 +34,9 @@ void Player::update(const float& dt)
 	this->movementComponent->update(dt);
 
 	if (this->movementComponent->getState(IDLE))
+	{
 		this->animationComponent->play("IDLE", dt);
+	}
 	else if(this->movementComponent->getState(MOVING))
 		this->animationComponent->play("MOVING", dt);
 
