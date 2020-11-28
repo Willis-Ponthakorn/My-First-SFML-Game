@@ -60,7 +60,11 @@ void MainMenuState::initButtons()
 		&this->font, "Settings",
 		sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 255), sf::Color(20, 20, 20, 200));
 
-	this->buttons["EXIT_STATE"] = new Button(465, 470, 150, 50,
+	this->buttons["EDITOR_STATE"] = new Button(465, 470, 150, 50,
+		&this->font, "Editor",
+		sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 255), sf::Color(20, 20, 20, 200));
+
+	this->buttons["EXIT_STATE"] = new Button(465, 570, 150, 50,
 		&this->font, "Exit",
 		sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 255), sf::Color(20, 20, 20, 200));
 }
@@ -99,6 +103,11 @@ void MainMenuState::updateButtons()
 	if (this->buttons["GAME_STATE"]->isPressed())
 	{
 		this->states->push(new GameState(this->window, this->supportedKeys, this->states));
+	}
+
+	if (this->buttons["EDITOR_STATE"]->isPressed())
+	{
+		this->states->push(new EditorState(this->window, this->supportedKeys, this->states));
 	}
 
 	if (this->buttons["EXIT_STATE"]->isPressed())

@@ -43,7 +43,7 @@ private:
 
 		void play(const float& dt)
 		{
-			this->timer += 10.f * dt;
+			this->timer += 25.f * dt;
 			if (this->timer >= this->animationTimer)
 			{
 				this->timer = 0.f;
@@ -71,6 +71,7 @@ private:
 	sf::Sprite& sprite;
 	sf::Texture& textureSheet;
 	std::map<std::string, Animation*> animations;
+	Animation* lastAnimation;
 
 public:
 	AnimationComponent(sf::Sprite& sprite, sf::Texture& texture_sheet);
