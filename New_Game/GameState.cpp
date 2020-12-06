@@ -20,12 +20,25 @@ void GameState::initKeybinds()
 
 }
 
+void GameState::initFonts()
+{
+	if (!this->font.loadFromFile("Fonts/Font.ttf"))
+	{
+		throw "ERROR::GAMESTATE::FAILED_TO_LOAD_FONT";
+	}
+}
+
 void GameState::initTexture()
 {
 	if (!this->textures["PLAYER_SHEET"].loadFromFile("res/image/mainCharacterResize2.png"))
 	{
 		throw "ERROR::GAMESTATE::COULD_NOT_LOAD_PLAYER_TEXTURE";
 	}
+}
+
+void GameState::initPauseMenu()
+{
+	this->pmenu = new PauseMenu(*this->window, this->font);
 }
 
 void GameState::initPlayer()
@@ -37,16 +50,30 @@ GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* suppo
 	: State(window, supportedKeys, states)
 {
 	this->initKeybinds();
+	this->initFonts();
 	this->initTexture();
+	this->initPauseMenu();
 	this->initPlayer();
 }
 
 GameState::~GameState()
 {
+	delete this->pmenu;
 	delete this->player;
 }
 
 void GameState::updateInput(const float& dt)
+{
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("CLOSE"))))
+	{
+		if (!this->paused)
+			this->pauseState();
+		else
+			this->unpauseState();
+	}
+}
+
+void GameState::updatePlayerInput(const float& dt)
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_LEFT"))))
 		this->player->move(-1.f, 0.f, dt);
@@ -56,8 +83,6 @@ void GameState::updateInput(const float& dt)
 		this->player->move(0.f, -1.f, dt);
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_DOWN"))))
 		this->player->move(0.f, 1.f, dt);
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("CLOSE"))))
-		this->endState();
 }
 
 void GameState::update(const float& dt)
@@ -65,7 +90,16 @@ void GameState::update(const float& dt)
 	this->updateMousePosition();
 	this->updateInput(dt);
 
-	this->player->update(dt);
+	if (!this->paused)
+	{
+		this->updatePlayerInput(dt);
+
+		this->player->update(dt);
+	}
+	else
+	{
+		this->pmenu->update();
+	}
 }
 
 void GameState::render(sf::RenderTarget* target)
@@ -74,4 +108,9 @@ void GameState::render(sf::RenderTarget* target)
 		target = this->window;
 
 	this->player->render(*target);
+
+	if (this->paused)
+	{
+		this->pmenu->render(*target);
+	}
 }

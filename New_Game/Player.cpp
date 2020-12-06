@@ -29,16 +29,28 @@ Player::~Player()
 
 }
 
-void Player::update(const float& dt)
+void Player::updateAttack()
 {
-	this->movementComponent->update(dt);
 
+}
+
+void Player::updateAnimation(const float& dt)
+{
 	if (this->movementComponent->getState(IDLE))
 	{
 		this->animationComponent->play("IDLE", dt);
 	}
 	else if(this->movementComponent->getState(MOVING))
 		this->animationComponent->play("MOVING", dt);
+}
+
+void Player::update(const float& dt)
+{
+	this->movementComponent->update(dt);
+
+	this->updateAttack();
+
+	this->updateAnimation(dt);
 
 	this->hitboxComponent->update();
 }
