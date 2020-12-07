@@ -1,6 +1,6 @@
-#include "Button.h"
+#include "Gui.h"
 
-Button::Button(float x, float y, float width, float height,
+gui::Button::Button(float x, float y, float width, float height,
 	sf::Font* font, std::string text,
 	sf::Color idleColor, sf::Color hoverColor, sf::Color activeColor)
 {
@@ -26,12 +26,12 @@ Button::Button(float x, float y, float width, float height,
 	this->shape.setFillColor(this->idleColor);
 }
 
-Button::~Button()
+gui::Button::~Button()
 {
 
 }
 
-const bool Button::isPressed() const
+const bool gui::Button::isPressed() const
 {
 	if (this->buttonState == BTN_PRESSED)
 		return true;
@@ -39,8 +39,18 @@ const bool Button::isPressed() const
 	return false;
 }
 
+const std::string& gui::Button::getText() const
+{
+	return this->text.getString();
+}
 
-void Button::update(const sf::Vector2f mousePos)
+void gui::Button::setText(const std::string text)
+{
+	this->text.setString(text);
+}
+
+
+void gui::Button::update(const sf::Vector2f& mousePos)
 {
 	this->buttonState = BTN_IDLE;
 
@@ -75,8 +85,44 @@ void Button::update(const sf::Vector2f mousePos)
 	}
 }
 
-void Button::render(sf::RenderTarget& target)
+void gui::Button::render(sf::RenderTarget& target)
 {
 	target.draw(this->shape);
 	target.draw(this->text);
+}
+
+gui::DropDownList::DropDownList(sf::Font& font, std::string list[], unsigned nrOfElements, unsigned default_index)
+	: font(font)
+{
+	//unsigned nrOfElements = sizeof(list) / sizeof(std::string);
+
+	for (size_t i = 0; i < nrOfElements; i++)
+	{
+		this->list.push_back(
+			new gui::Button(
+				465.f, 270.f, 150.f, 50.f,
+				&this->font, list[i],
+				sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 255), sf::Color(20, 20, 20, 200)
+			)
+		);
+	}
+
+	this->activeElement = new Button(*this->list[default_index]);
+}
+
+gui::DropDownList::~DropDownList()
+{
+	delete this->activeElement;
+	for (auto*& i : this->list)
+		delete i;
+}
+
+void gui::DropDownList::update(const sf::Vector2f& mousePos)
+{
+
+}
+
+void gui::DropDownList::render(sf::RenderTarget& target)
+{
+
 }

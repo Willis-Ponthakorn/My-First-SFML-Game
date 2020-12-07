@@ -7,6 +7,8 @@ State::State(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys
 	this->states = states;
 	this->quit = false;
 	this->paused = false;
+	this->keytime = 0.f;
+	this->keytimeMax = 10.f;
 }
 
 State::~State()
@@ -17,6 +19,17 @@ State::~State()
 const bool& State::getQuit() const
 {
 	return this->quit;
+}
+
+const bool State::getKeytime()
+{
+	if (this->keytime >= this->keytimeMax)
+	{
+		this->keytime = 0.f;
+		return true;
+	}
+
+	return false;
 }
 
 void State::endState()
@@ -39,4 +52,10 @@ void State::updateMousePosition()
 	this->mousePosScreen = sf::Mouse::getPosition();
 	this->mousePosWindow = sf::Mouse::getPosition(*this->window);
 	this->mousePosView = this->window->mapPixelToCoords(sf::Mouse::getPosition(*this->window));
+}
+
+void State::updateKeytime(const float& dt)
+{
+	if (this->keytime < this->keytimeMax)
+		this->keytime += 50.f * dt;
 }

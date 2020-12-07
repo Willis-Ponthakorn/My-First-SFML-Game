@@ -41,9 +41,34 @@ PauseMenu::~PauseMenu()
 	}
 }
 
-void PauseMenu::update()
+std::map<std::string, gui::Button*>& PauseMenu::getButtons()
 {
+	return this->buttons;
+}
 
+const bool PauseMenu::isButtonPressed(const std::string key)
+{
+	return this->buttons[key]->isPressed();
+}
+
+void PauseMenu::addButton(const std::string key, float y, const std::string text)
+{
+	float width = 150.f;
+	float height = 50.f;
+	float x = this->container.getPosition().x + this->container.getSize().x / 2.f - width / 2.f;
+
+	this->buttons[key] = new gui::Button(x, y, width, height,
+		&this->font, text,
+		sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 255), sf::Color(20, 20, 20, 200));
+
+}
+
+void PauseMenu::update(const sf::Vector2f& mousePos)
+{
+	for (auto& i : this->buttons)
+	{
+		i.second->update(mousePos);
+	}
 }
 
 void PauseMenu::render(sf::RenderTarget& target)
