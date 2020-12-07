@@ -55,6 +55,9 @@ void SettingState::initButtons()
 	this->buttons["EXIT_STATE"] = new gui::Button(465.f, 570.f, 150.f, 50.f,
 		&this->font, "Leave",
 		sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 255), sf::Color(20, 20, 20, 200));
+
+	std::string li[] = { "test1","test2","test3","test4","test5" };
+	this->ddl = new gui::DropDownList(100.f, 100.f, 200.f, 50.f, font, li, 5);
 }
 
 SettingState::SettingState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states)
@@ -74,6 +77,7 @@ SettingState::~SettingState()
 	{
 		delete it->second;
 	}
+	delete this->ddl;
 }
 
 void SettingState::updateInput(const float& dt)
@@ -100,6 +104,8 @@ void SettingState::update(const float& dt)
 	this->updateInput(dt);
 
 	this->updateButtons();
+
+	this->ddl->update(this->mousePosView, dt);
 }
 
 void SettingState::renderButtons(sf::RenderTarget& target)
@@ -118,6 +124,8 @@ void SettingState::render(sf::RenderTarget* target)
 	target->draw(this->background);
 
 	this->renderButtons(*target);
+
+	this->ddl->render(*target);
 
 	/*sf::Text mouseText;
 	mouseText.setPosition(this->mousePosView.x, this->mousePosView.y - 50);

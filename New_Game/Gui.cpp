@@ -91,8 +91,10 @@ void gui::Button::render(sf::RenderTarget& target)
 	target.draw(this->text);
 }
 
-gui::DropDownList::DropDownList(sf::Font& font, std::string list[], unsigned nrOfElements, unsigned default_index)
-	: font(font)
+gui::DropDownList::DropDownList(float x, float y, float width, float height, 
+	sf::Font& font, std::string list[], 
+	unsigned nrOfElements, unsigned default_index)
+	: font(font), showList(false), keytimeMax(1.f), keytime(0.f)
 {
 	//unsigned nrOfElements = sizeof(list) / sizeof(std::string);
 
@@ -100,9 +102,9 @@ gui::DropDownList::DropDownList(sf::Font& font, std::string list[], unsigned nrO
 	{
 		this->list.push_back(
 			new gui::Button(
-				465.f, 270.f, 150.f, 50.f,
+				x, y + (i * height), width, height,
 				&this->font, list[i],
-				sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 255), sf::Color(20, 20, 20, 200)
+				sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 200), sf::Color(20, 20, 20, 200)
 			)
 		);
 	}
@@ -113,16 +115,60 @@ gui::DropDownList::DropDownList(sf::Font& font, std::string list[], unsigned nrO
 gui::DropDownList::~DropDownList()
 {
 	delete this->activeElement;
-	for (auto*& i : this->list)
-		delete i;
+	for (size_t i = 0; i < this->list.size(); i++)
+	{
+		delete this->list[i];
+	}
 }
 
-void gui::DropDownList::update(const sf::Vector2f& mousePos)
+const bool gui::DropDownList::getKeytime()
 {
+	if (this->keytime >= keytimeMax)
+	{
+		this->keytime = 0.f;
+		return true;
+	}
+	return false;
+}
 
+void gui::DropDownList::updateKeytime(const float& dt)
+{
+	if (this->keytime < this->keytimeMax)
+		this->keytime += 10.f * dt;
+}
+
+void gui::DropDownList::update(const sf::Vector2f& mousePos, const float& dt)
+{
+	this->updateKeytime(dt);
+
+	this->activeElement->update(mousePos);
+
+	if (this->activeElement->isPressed() && this->getKeytime())
+	{
+		if (this->showList)
+			this->showList = false;
+		else
+			this->showList = true;
+	}
+
+	if (this->showList)
+	{
+		for (auto& i : this->list)
+		{
+			i->update(mousePos);
+		}
+	}
 }
 
 void gui::DropDownList::render(sf::RenderTarget& target)
 {
+	this->activeElement->render(target);
 
+	if (this->showList)
+	{
+		for (auto& i : this->list)
+		{
+			i->render(target);
+		}
+	}
 }

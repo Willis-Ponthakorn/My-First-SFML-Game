@@ -49,15 +49,23 @@ namespace gui
 	class DropDownList
 	{
 	private:
+		float keytime;
+		float keytimeMax;
+
 		sf::Font& font;
 		gui::Button* activeElement;
 		std::vector<gui::Button*> list;
+		bool showList;
 
 	public:
-		DropDownList(sf::Font& font, std::string list[], unsigned nrOfElements, unsigned default_index = 0);
+		DropDownList(float x, float y, float width, float height, 
+			sf::Font& font, std::string list[], 
+			unsigned nrOfElements, unsigned default_index = 0);
 		~DropDownList();
 		
-		void update(const sf::Vector2f& mousePos);
+		const bool getKeytime();
+		void updateKeytime(const float& dt);
+		void update(const sf::Vector2f& mousePos, const float& dt);
 		void render(sf::RenderTarget& target);
 	};
 }
