@@ -5,9 +5,7 @@ int main()
 {
 	Game game;
 
-	while (game.getWindowIsOpen())
-	{
-		game.run();
-	}
+	game.run();
+
 	return 0;
 }

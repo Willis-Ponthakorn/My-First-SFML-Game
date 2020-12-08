@@ -138,6 +138,8 @@ void GameState::render(sf::RenderTarget* target)
 
 	target->draw(this->background);
 
+	//this->map.render(*target);
+
 	this->player->render(*target);
 
 	if (this->paused)

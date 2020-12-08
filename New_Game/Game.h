@@ -6,12 +6,9 @@
 class Game
 {
 private:
-
+	GameSettings gSettings;
 	sf::RenderWindow* window;
-	sf::VideoMode videoMode;
 	sf::Event event;
-	std::vector<sf::VideoMode> videoModes;
-	sf::ContextSettings windowSettings;
 
 	sf::Clock dtClock;
 	float dt;
@@ -21,6 +18,7 @@ private:
 	std::map<std::string, int> supportedKeys;
 
 	void initVariables();
+	void initGameSettings();
 	void initWindow();
 	void initKeys();
 	void initStates();

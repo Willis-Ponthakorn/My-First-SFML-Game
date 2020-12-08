@@ -5,33 +5,25 @@
 void Game::initVariables()
 {
 	this->window = nullptr;
+
 	this->dt = 0.f;
+}
+
+void Game::initGameSettings()
+{
+	this->gSettings.loadFromFile("Config/game_setting.ini");
 }
 
 void Game::initWindow()
 {
-	std::ifstream ifs("Config/window.ini");
-	this->videoModes = sf::VideoMode::getFullscreenModes();
+	this->window = new sf::RenderWindow(
+		this->gSettings.resolution,
+		this->gSettings.title,
+		sf::Style::Titlebar | sf::Style::Close,
+		this->gSettings.contextSettings);
 
-	std::string title = "None";
-	sf::VideoMode window_bounds = sf::VideoMode::getDesktopMode();
-	unsigned framerate_limit = 120;
-	bool vertical_sync_enabled = false;
-
-	if (ifs.is_open())
-	{
-		std::getline(ifs, title);
-		ifs >> window_bounds.width >> window_bounds.height;
-		ifs >> framerate_limit;
-		ifs >> vertical_sync_enabled;
-	}
-
-	ifs.close();
-
-	this->window = new sf::RenderWindow(window_bounds, title, sf::Style::Titlebar | sf::Style::Close, windowSettings);
-
-	this->window->setFramerateLimit(framerate_limit);
-	this->window->setVerticalSyncEnabled(vertical_sync_enabled);
+	this->window->setFramerateLimit(this->gSettings.frameRateLimit);
+	this->window->setVerticalSyncEnabled(this->gSettings.verticalSync);
 }
 
 void Game::initKeys()
@@ -59,11 +51,13 @@ void Game::initKeys()
 
 void Game::initStates()
 {
-	this->states.push(new MainMenuState(this->window, &this->supportedKeys, &this->states));
+	this->states.push(new MainMenuState(this->window, this->gSettings, &this->supportedKeys, &this->states));
 }
 
 Game::Game()
 {
+	this->initVariables();
+	this->initGameSettings();
 	this->initVariables();
 	this->initWindow();
 	this->initKeys();

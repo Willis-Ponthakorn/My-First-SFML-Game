@@ -8,6 +8,7 @@ class SettingState :
     public State
 {
 private: 
+    GameSettings& gSettings;
     sf::Texture bgTexture;
     sf::RectangleShape background;
     sf::Font font;
@@ -25,7 +26,7 @@ private:
     void initText();
 
 public:
-    SettingState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states);
+    SettingState(sf::RenderWindow* window, GameSettings& gSettings, std::map<std::string, int>* supportedKeys, std::stack<State*>* states);
     virtual ~SettingState();
 
     void updateInput(const float& dt);

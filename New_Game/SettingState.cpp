@@ -78,8 +78,8 @@ void SettingState::initText()
 	);
 }
 
-SettingState::SettingState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states)
-	: State(window, supportedKeys, states)
+SettingState::SettingState(sf::RenderWindow* window, GameSettings& gSettings, std::map<std::string, int>* supportedKeys, std::stack<State*>* states)
+	: State(window, supportedKeys, states), gSettings(gSettings)
 {
 	this->initVariables();
 	this->initBackground();
@@ -123,7 +123,7 @@ void SettingState::updateGui(const float& dt)
 
 	if (this->buttons["APPLY"]->isPressed())
 	{
-		
+		this->window->create(this->gSettings.resolution, this->gSettings.title, sf::Style::Titlebar | sf::Style::Close);
 	}
 
 	for (auto& it : this->dropDownLists)
