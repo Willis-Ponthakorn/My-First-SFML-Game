@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "SettingState.h"
 
 void SettingState::initVariables()
@@ -50,14 +51,31 @@ void SettingState::initKeybinds()
 
 }
 
-void SettingState::initButtons()
+void SettingState::initGui()
 {
-	this->buttons["EXIT_STATE"] = new gui::Button(465.f, 570.f, 150.f, 50.f,
-		&this->font, "Leave",
+	this->buttons["BACK"] = new gui::Button(390.f, 620.f, 150.f, 50.f,
+		&this->font, "Back",
 		sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 255), sf::Color(20, 20, 20, 200));
 
-	std::string li[] = { "test1","test2","test3","test4","test5" };
-	this->ddl = new gui::DropDownList(100.f, 100.f, 200.f, 50.f, font, li, 5);
+	this->buttons["APPLY"] = new gui::Button(550.f, 620.f, 150.f, 50.f,
+		&this->font, "Apply",
+		sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 255), sf::Color(20, 20, 20, 200));
+
+	std::string li[] = { "0%","25%","50%","75%","100%" };
+	this->dropDownLists["SOUND"] = new gui::DropDownList(465.f, 270.f, 150.f, 50.f, font, li, 5);
+}
+
+void SettingState::initText()
+{
+	this->optionsText.setFont(this->font);
+	this->optionsText.setPosition(sf::Vector2f(100.f, 270.f));
+	this->optionsText.setCharacterSize(40);
+	this->optionsText.setFillColor(sf::Color(255, 255, 255, 200));
+
+
+	this->optionsText.setString(
+		"Volume \n\nVsync \n\n"
+	);
 }
 
 SettingState::SettingState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states)
@@ -67,7 +85,8 @@ SettingState::SettingState(sf::RenderWindow* window, std::map<std::string, int>*
 	this->initBackground();
 	this->initFonts();
 	this->initKeybinds();
-	this->initButtons();
+	this->initGui();
+	this->initText();
 }
 
 SettingState::~SettingState()
@@ -77,7 +96,12 @@ SettingState::~SettingState()
 	{
 		delete it->second;
 	}
-	delete this->ddl;
+	
+	auto it2 = this->dropDownLists.begin();
+	for (it2 = this->dropDownLists.begin(); it2 != this->dropDownLists.end(); ++it2)
+	{
+		delete it2->second;
+	}
 }
 
 void SettingState::updateInput(const float& dt)
@@ -85,16 +109,26 @@ void SettingState::updateInput(const float& dt)
 
 }
 
-void SettingState::updateButtons()
+void SettingState::updateGui(const float& dt)
 {
 	for (auto& it : this->buttons)
 	{
 		it.second->update(this->mousePosView);
 	}
 
-	if (this->buttons["EXIT_STATE"]->isPressed())
+	if (this->buttons["BACK"]->isPressed())
 	{
 		this->endState();
+	}
+
+	if (this->buttons["APPLY"]->isPressed())
+	{
+		
+	}
+
+	for (auto& it : this->dropDownLists)
+	{
+		it.second->update(this->mousePosView, dt);
 	}
 }
 
@@ -103,14 +137,17 @@ void SettingState::update(const float& dt)
 	this->updateMousePosition();
 	this->updateInput(dt);
 
-	this->updateButtons();
-
-	this->ddl->update(this->mousePosView, dt);
+	this->updateGui(dt);
 }
 
-void SettingState::renderButtons(sf::RenderTarget& target)
+void SettingState::renderGui(sf::RenderTarget& target)
 {
 	for (auto& it : this->buttons)
+	{
+		it.second->render(target);
+	}
+
+	for (auto& it : this->dropDownLists)
 	{
 		it.second->render(target);
 	}
@@ -123,11 +160,11 @@ void SettingState::render(sf::RenderTarget* target)
 
 	target->draw(this->background);
 
-	this->renderButtons(*target);
+	this->renderGui(*target);
 
-	this->ddl->render(*target);
+	target->draw(this->optionsText);
 
-	/*sf::Text mouseText;
+	sf::Text mouseText;
 	mouseText.setPosition(this->mousePosView.x, this->mousePosView.y - 50);
 	mouseText.setFont(this->font);
 	mouseText.setCharacterSize(12);
@@ -135,6 +172,6 @@ void SettingState::render(sf::RenderTarget* target)
 	ss << this->mousePosView.x << " " << this->mousePosView.y;
 	mouseText.setString(ss.str());
 
-	target->draw(mouseText);*/
+	target->draw(mouseText);
 }
 

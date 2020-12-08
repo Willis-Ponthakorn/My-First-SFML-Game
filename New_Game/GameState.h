@@ -8,12 +8,15 @@ class GameState :
     public State
 {
 private:
+    sf::Texture bgTexture;
+    sf::RectangleShape background;
     sf::Font font;
     PauseMenu* pmenu;
 
     Player* player;
     sf::Texture texture;
 
+    void initBackground();
     void initKeybinds();
     void initFonts();
     void initTexture();

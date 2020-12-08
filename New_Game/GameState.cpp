@@ -1,5 +1,23 @@
+#include "stdafx.h"
 #include "GameState.h"
 
+void GameState::initBackground()
+{
+	this->background.setSize(
+		sf::Vector2f
+		(
+			static_cast<float>(this->window->getSize().x),
+			static_cast<float>(this->window->getSize().y)
+		)
+	);
+
+	if (!this->bgTexture.loadFromFile("res/image/background.png"))
+	{
+		throw "ERROR::MAINMENUSTATE::FAILED_TO_LOAD_BACKGROUND_TEXTURE";
+	}
+
+	this->background.setTexture(&this->bgTexture);
+}
 
 void GameState::initKeybinds()
 {
@@ -51,6 +69,7 @@ void GameState::initPlayer()
 GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states)
 	: State(window, supportedKeys, states)
 {
+	this->initBackground();
 	this->initKeybinds();
 	this->initFonts();
 	this->initTexture();
@@ -116,6 +135,8 @@ void GameState::render(sf::RenderTarget* target)
 {
 	if (!target)
 		target = this->window;
+
+	target->draw(this->background);
 
 	this->player->render(*target);
 

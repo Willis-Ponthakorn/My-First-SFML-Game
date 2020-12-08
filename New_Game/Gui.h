@@ -1,17 +1,6 @@
 #ifndef GUI_H
 #define GUI_H
 
-#include<iostream>
-#include<ctime>
-#include<cstdlib>
-#include<sstream>
-#include<vector>
-
-#include<SFML/System.hpp>
-#include<SFML/Graphics.hpp>
-#include<SFML/Window.hpp>
-#include<SFML/Audio.hpp>
-
 enum button_states { BTN_IDLE = 0, BTN_HOVER, BTN_PRESSED };
 
 namespace gui
@@ -20,6 +9,7 @@ namespace gui
 	{
 	private:
 		short unsigned buttonState;
+		short unsigned id;
 
 		sf::RectangleShape shape;
 		sf::Font* font;
@@ -29,18 +19,26 @@ namespace gui
 		sf::Color hoverColor;
 		sf::Color activeColor;
 
+		sf::Color outlineIdleColor;
+		sf::Color outlineHoverColor;
+		sf::Color outlineActiveColor;
+
 
 
 	public:
 		Button(float x, float y, float width, float height,
 			sf::Font* font, std::string text,
-			sf::Color idleColor, sf::Color hoverColor, sf::Color activeColor);
+			sf::Color idleColor, sf::Color hoverColor, sf::Color activeColor,
+			sf::Color outlineIdleColor = sf::Color::Transparent, sf::Color outlineHoverColor = sf::Color::Transparent, sf::Color outlineActiveColor = sf::Color::Transparent,
+			short unsigned id = 0);
 		~Button();
 
 		const bool isPressed() const;
-		const std::string& getText() const;
+		const std::string getText() const;
+		const short unsigned& getId() const;
 
 		void setText(const std::string text);
+		void setId(const short unsigned id);
 
 		void update(const sf::Vector2f& mousePos);
 		void render(sf::RenderTarget& target);
@@ -62,6 +60,8 @@ namespace gui
 			sf::Font& font, std::string list[], 
 			unsigned nrOfElements, unsigned default_index = 0);
 		~DropDownList();
+
+		const unsigned short& getActiveElementId() const;
 		
 		const bool getKeytime();
 		void updateKeytime(const float& dt);

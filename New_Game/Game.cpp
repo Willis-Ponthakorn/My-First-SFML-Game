@@ -1,10 +1,10 @@
+#include "stdafx.h"
 #include "Game.h"
 
 
 void Game::initVariables()
 {
 	this->window = nullptr;
-	this->fullscreen = false;
 	this->dt = 0.f;
 }
 
