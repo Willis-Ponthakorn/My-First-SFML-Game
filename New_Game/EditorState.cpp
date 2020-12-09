@@ -4,6 +4,23 @@
 void EditorState::initVariables()
 {
 	this->textureRect = sf::IntRect(0, 0, static_cast<int>(this->stateData->gridSize), static_cast<int>(this->stateData->gridSize));
+	this->collision = false;
+	this->type = TileTypes::DEFAULT;
+}
+
+void EditorState::initView()
+{
+	this->view.setSize(
+		sf::Vector2f(
+			this->stateData->gSettings->resolution.width,
+			this->stateData->gSettings->resolution.height
+		)
+	);
+
+	this->view.setCenter(
+		this->stateData->gSettings->resolution.width / 2.f,
+		this->stateData->gSettings->resolution.height / 2.f
+	);
 }
 
 void EditorState::initBackground()
@@ -50,7 +67,8 @@ void EditorState::initPauseMenu()
 {
 	this->pmenu = new PauseMenu(*this->window, this->font);
 
-	this->pmenu->addButton("SAVE", 470.f, "Save");
+	this->pmenu->addButton("LOAD", 320.f, "Load");
+	this->pmenu->addButton("SAVE", 420.f, "Save");
 	this->pmenu->addButton("QUIT", 520.f, "Leave");
 }
 
@@ -92,6 +110,7 @@ EditorState::EditorState(StateData* state_data)
 	: State(state_data)
 {
 	this->initVariables();
+	this->initView();
 	this->initBackground();
 	this->initFonts();
 	this->initText();
@@ -130,13 +149,23 @@ void EditorState::updateInput(const float& dt)
 
 void EditorState::updateEditorInput(const float& dt)
 {
+	//Move view
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && this->getKeytime())
+	{
+		this->view.move(this->stateData->gSettings->resolution.width, 0);
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && this->getKeytime())
+	{
+		this->view.move(this->stateData->gSettings->resolution.width * -1.f, 0);
+	}
+
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && this->getKeytime())
 	{
 		if (!this->sidebar.getGlobalBounds().contains(sf::Vector2f(this->mousePosWindow)))
 		{
 			if (!this->textureSelector->getActive())
 			{
-				this->tileMap->addTile(this->mousePosGrid.x, this->mousePosGrid.y, 0, this->textureRect);
+				this->tileMap->addTile(this->mousePosGrid.x, this->mousePosGrid.y, 0, this->textureRect, this->collision, this->type);
 			}
 			else
 			{
@@ -151,6 +180,23 @@ void EditorState::updateEditorInput(const float& dt)
 			if (!this->textureSelector->getActive())
 				this->tileMap->removeTile(this->mousePosGrid.x, this->mousePosGrid.y, 0);
 		}
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("TOGGLE_COLLISION"))) && this->getKeytime())
+	{
+		if (this->collision)
+			this->collision = false;
+		else
+			this->collision = true;
+	}
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("INCREASE_TYPE"))) && this->getKeytime())
+	{
+		++this->type;
+	}
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("DECREASE_TYPE"))) && this->getKeytime())
+	{
+		if (this->type > 0)
+			--this->type;
 	}
 }
 
@@ -176,7 +222,9 @@ void EditorState::updateGui(const float& dt)
 	std::stringstream ss;
 	ss << this->mousePosView.x << " " << this->mousePosView.y << "\n" 
 		<< this->mousePosGrid.x << " " << this->mousePosGrid.y << "\n"
-		<< this->textureRect.left << " " << this->textureRect.top;
+		<< this->textureRect.left << " " << this->textureRect.top << "\n"
+		<< "Collision: " << this->collision << "\n"
+		<< "Type: " << this->type;
 	this->cusorText.setString(ss.str());
 
 	
@@ -184,8 +232,12 @@ void EditorState::updateGui(const float& dt)
 
 void EditorState::updatePauseMenuButtons()
 {
+	if (this->pmenu->isButtonPressed("LOAD"))
+		this->tileMap->loadFromFile("text.eosmp");
+
 	if (this->pmenu->isButtonPressed("SAVE"))
 		this->tileMap->saveToFile("text.eosmp");
+
 	if (this->pmenu->isButtonPressed("QUIT"))
 		this->endState();
 }
@@ -233,9 +285,11 @@ void EditorState::render(sf::RenderTarget* target)
 {
 	if (!target)
 		target = this->window;
-
+	
+	target->setView(this->view);
 	this->tileMap->render(*target);
 
+	target->setView(this->window->getDefaultView());
 	this->renderButtons(*target);
 	this->renderGui(*target);
 
