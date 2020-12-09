@@ -9,28 +9,65 @@ TileMap::TileMap(float gridSize, unsigned width, unsigned height)
 	this->maxSize.y = height;
 	this->layers = 1;
 
-	this->map.reserve(this->maxSize.x);
+	this->map.resize(this->maxSize.x, std::vector< std::vector<Tile*> >());
 	for (size_t x = 0; x < this->maxSize.x; x++)
 	{
-		this->map.push_back(std::vector< std::vector<Tile> >());
 
 		for (size_t y = 0; y < this->maxSize.y; y++)
 		{
-			this->map[x].reserve(this->maxSize.y);
-			this->map[x].push_back(std::vector<Tile>());
-
+			this->map[x].resize(this->maxSize.y, std::vector<Tile*>());
 			for (size_t z = 0; z < this->layers; z++)
 			{
-				this->map[x][y].reserve(this->layers);
-				this->map[x][y].push_back(Tile(x * this->gridSizeF, y * this->gridSizeF, this->gridSizeF));
+				this->map[x][y].resize(this->layers, NULL);
+			}
+		}
+	}
+
+	if (!this->tileTextureSheet.loadFromFile("res/image/Tileset.png"))
+		std::cout << "ERROR::TILEMAP::FAILED TO LOAD TILETEXTURESHEET." << "\n";
+}
+
+TileMap::~TileMap()
+{
+	for (size_t x = 0; x < this->maxSize.x; x++)
+	{
+		for (size_t y = 0; y < this->maxSize.y; y++)
+		{
+			for (size_t z = 0; z < this->layers; z++)
+			{
+				delete this->map[x][y][z];
 			}
 		}
 	}
 }
 
-TileMap::~TileMap()
+void TileMap::addTile(const unsigned x, const unsigned y, const unsigned z, const sf::IntRect& texture_rect)
 {
+	if (x < this->maxSize.x && x >= 0 &&
+		y < this->maxSize.y && y >= 0 &&
+		z < this->layers && z >= 0)
+	{
+		if (this->map[x][y][z] == NULL)
+		{
+			this->map[x][y][z] = new Tile(x * this->gridSizeF, y * gridSizeF, this->gridSizeF, this->tileTextureSheet, texture_rect);
+			std::cout << "DEBUG: ADDED TILE!" << "\n";
+		}
+	}
+}
 
+void TileMap::removeTile(const unsigned x, const unsigned y, const unsigned z)
+{
+	if (x < this->maxSize.x && x >= 0 &&
+		y < this->maxSize.y && y >= 0 &&
+		z < this->layers && z >= 0)
+	{
+		if (this->map[x][y][z] != NULL)
+		{
+			delete this->map[x][y][z];
+			this->map[x][y][z] = NULL;
+			std::cout << "DEBUG: REMOVED TILE!" << "\n";
+		}
+	}
 }
 
 void TileMap::update()
@@ -44,20 +81,13 @@ void TileMap::render(sf::RenderTarget& target)
 	{
 		for (auto &y : x)
 		{
-			for (auto &z : y)
+			for (auto *z : y)
 			{
-				z.render(target);
+				if(z != NULL)
+				z->render(target);
 			}
 		}
 	}
 }
 
-void TileMap::addTile()
-{
 
-}
-
-void TileMap::removeTile()
-{
-
-}

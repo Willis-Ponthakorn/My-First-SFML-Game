@@ -164,7 +164,7 @@ void SettingState::render(sf::RenderTarget* target)
 
 	target->draw(this->optionsText);
 
-	sf::Text mouseText;
+	/*sf::Text mouseText;
 	mouseText.setPosition(this->mousePosView.x, this->mousePosView.y - 50);
 	mouseText.setFont(this->font);
 	mouseText.setCharacterSize(12);
@@ -172,6 +172,6 @@ void SettingState::render(sf::RenderTarget* target)
 	ss << this->mousePosView.x << " " << this->mousePosView.y;
 	mouseText.setString(ss.str());
 
-	target->draw(mouseText);
+	target->draw(mouseText);*/
 }
 
