@@ -19,6 +19,14 @@ void EditorState::initFonts()
 	}
 }
 
+void EditorState::initText()
+{
+	this->cusorText.setFont(this->font);
+	this->cusorText.setFillColor(sf::Color::White);
+	this->cusorText.setCharacterSize(12);
+	this->cusorText.setPosition(this->mousePosView.x, this->mousePosView.y - 50.f);
+}
+
 void EditorState::initKeybinds()
 {
 	std::ifstream ifs("Config/editorstate_keybinds.ini");
@@ -42,6 +50,7 @@ void EditorState::initPauseMenu()
 {
 	this->pmenu = new PauseMenu(*this->window, this->font);
 
+	this->pmenu->addButton("SAVE", 470.f, "Save");
 	this->pmenu->addButton("QUIT", 520.f, "Leave");
 }
 
@@ -52,16 +61,31 @@ void EditorState::initButtons()
 
 void EditorState::initGui()
 {
+	this->sidebar.setSize(sf::Vector2f(22.f, static_cast<float>(this->stateData->gSettings->resolution.height)));
+	this->sidebar.setFillColor(sf::Color(50, 50, 50, 100));
+	this->sidebar.setOutlineThickness(1.f);
+	this->sidebar.setOutlineColor(sf::Color(200, 200, 200, 150));
+	
+
 	this->selectorRect.setSize(sf::Vector2f(this->stateData->gridSize,this->stateData->gridSize));
 	
-	this->selectorRect.setFillColor(sf::Color::Transparent);
+	this->selectorRect.setFillColor(sf::Color(255, 255, 255, 150));
 	this->selectorRect.setOutlineThickness(1.f);
 	this->selectorRect.setOutlineColor(sf::Color::Green);
+
+	this->selectorRect.setTexture(this->tileMap->getTileSheet());
+	this->selectorRect.setTextureRect(this->textureRect);
+
+	this->textureSelector = new gui::TextureSelector(
+		0.f, 20.f, 576.f, 320.f, 
+		this->stateData->gridSize, this->tileMap->getTileSheet(),
+		this->font, "S/H"
+	);
 }
 
 void EditorState::initTileMap()
 {
-	this->tileMap = new TileMap(this->stateData->gridSize, 40, 30);
+	this->tileMap = new TileMap(this->stateData->gridSize, 40, 30, "res/image/Tileset3.png");
 }
 
 EditorState::EditorState(StateData* state_data)
@@ -70,11 +94,12 @@ EditorState::EditorState(StateData* state_data)
 	this->initVariables();
 	this->initBackground();
 	this->initFonts();
+	this->initText();
 	this->initKeybinds();
 	this->initPauseMenu();
 	this->initButtons();
-	this->initGui();
 	this->initTileMap();
+	this->initGui();
 }
 
 EditorState::~EditorState()
@@ -88,6 +113,8 @@ EditorState::~EditorState()
 	delete this->pmenu;
 
 	delete this->tileMap;
+
+	delete this->textureSelector;
 }
 
 void EditorState::updateInput(const float& dt)
@@ -105,19 +132,24 @@ void EditorState::updateEditorInput(const float& dt)
 {
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && this->getKeytime())
 	{
-		this->tileMap->addTile(this->mousePosGrid.x, this->mousePosGrid.y, 0, this->textureRect);
+		if (!this->sidebar.getGlobalBounds().contains(sf::Vector2f(this->mousePosWindow)))
+		{
+			if (!this->textureSelector->getActive())
+			{
+				this->tileMap->addTile(this->mousePosGrid.x, this->mousePosGrid.y, 0, this->textureRect);
+			}
+			else
+			{
+				this->textureRect = this->textureSelector->getTextureRect();
+			}
+		}
 	}
-
 	else if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && this->getKeytime())
 	{
-		this->tileMap->removeTile(this->mousePosGrid.x, this->mousePosGrid.y, 0);
-	}
-
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && this->getKeytime())
-	{
-		if (this->textureRect.left < 32)
+		if (!this->sidebar.getGlobalBounds().contains(sf::Vector2f(this->mousePosWindow)))
 		{
-			this->textureRect.left += 32;
+			if (!this->textureSelector->getActive())
+				this->tileMap->removeTile(this->mousePosGrid.x, this->mousePosGrid.y, 0);
 		}
 	}
 }
@@ -130,13 +162,30 @@ void EditorState::updateButtons()
 	}
 }
 
-void EditorState::updateGui()
-{
-	this->selectorRect.setPosition(this->mousePosGrid.x * this->stateData->gridSize, this->mousePosGrid.y * this->stateData->gridSize);
+void EditorState::updateGui(const float& dt)
+{	
+	this->textureSelector->update(this->mousePosWindow, dt);
+
+	if (!this->textureSelector->getActive())
+	{
+		this->selectorRect.setTextureRect(this->textureRect);
+		this->selectorRect.setPosition(this->mousePosGrid.x * this->stateData->gridSize, this->mousePosGrid.y * this->stateData->gridSize);
+	}
+
+	this->cusorText.setPosition(this->mousePosView.x + 100.f, this->mousePosView.y - 50.f);
+	std::stringstream ss;
+	ss << this->mousePosView.x << " " << this->mousePosView.y << "\n" 
+		<< this->mousePosGrid.x << " " << this->mousePosGrid.y << "\n"
+		<< this->textureRect.left << " " << this->textureRect.top;
+	this->cusorText.setString(ss.str());
+
+	
 }
 
 void EditorState::updatePauseMenuButtons()
 {
+	if (this->pmenu->isButtonPressed("SAVE"))
+		this->tileMap->saveToFile("text.eosmp");
 	if (this->pmenu->isButtonPressed("QUIT"))
 		this->endState();
 }
@@ -150,7 +199,7 @@ void EditorState::update(const float& dt)
 	if (!this->paused)
 	{
 		this->updateButtons();
-		this->updateGui();
+		this->updateGui(dt);
 		this->updateEditorInput(dt);
 	}
 	else
@@ -170,7 +219,14 @@ void EditorState::renderButtons(sf::RenderTarget& target)
 
 void EditorState::renderGui(sf::RenderTarget& target)
 {
-	target.draw(this->selectorRect);
+	if(!this->textureSelector->getActive())
+		target.draw(this->selectorRect);
+
+	this->textureSelector->render(target);
+
+	target.draw(this->cusorText);
+
+	target.draw(this->sidebar);
 }
 
 void EditorState::render(sf::RenderTarget* target)
@@ -178,25 +234,16 @@ void EditorState::render(sf::RenderTarget* target)
 	if (!target)
 		target = this->window;
 
+	this->tileMap->render(*target);
+
 	this->renderButtons(*target);
 	this->renderGui(*target);
-
-	this->tileMap->render(*target);
 
 	if (this->paused)
 	{
 		this->pmenu->render(*target);
 	}
 
-	sf::Text mouseText;
-	mouseText.setPosition(this->mousePosView.x, this->mousePosView.y - 50);
-	mouseText.setFont(this->font);
-	mouseText.setCharacterSize(12);
-	std::stringstream ss;
-	ss << this->mousePosView.x << " " << this->mousePosView.y << "\n" << this->textureRect.left << " " << this->textureRect.top;
-	mouseText.setString(ss.str());
-
-	target->draw(mouseText);
 }
 
 

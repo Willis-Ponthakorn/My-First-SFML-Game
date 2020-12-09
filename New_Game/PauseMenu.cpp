@@ -59,7 +59,7 @@ void PauseMenu::addButton(const std::string key, float y, const std::string text
 	float x = this->container.getPosition().x + this->container.getSize().x / 2.f - width / 2.f;
 
 	this->buttons[key] = new gui::Button(x, y, width, height,
-		&this->font, text,
+		&this->font, text, 20,
 		sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 255), sf::Color(20, 20, 20, 200));
 
 }

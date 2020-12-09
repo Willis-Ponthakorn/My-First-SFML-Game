@@ -54,11 +54,11 @@ void SettingState::initKeybinds()
 void SettingState::initGui()
 {
 	this->buttons["BACK"] = new gui::Button(390.f, 620.f, 150.f, 50.f,
-		&this->font, "Back",
+		&this->font, "Back", 20,
 		sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 255), sf::Color(20, 20, 20, 200));
 
 	this->buttons["APPLY"] = new gui::Button(550.f, 620.f, 150.f, 50.f,
-		&this->font, "Apply",
+		&this->font, "Apply", 20,
 		sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 255), sf::Color(20, 20, 20, 200));
 
 	std::string li[] = { "0%","25%","50%","75%","100%" };

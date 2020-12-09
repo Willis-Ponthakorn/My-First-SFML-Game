@@ -1,8 +1,9 @@
 #include "stdafx.h"
 #include "Gui.h"
 
+//BUTTON ==============================================================================
 gui::Button::Button(float x, float y, float width, float height,
-	sf::Font* font, std::string text,
+	sf::Font* font, std::string text, unsigned int characterSize,
 	sf::Color idleColor, sf::Color hoverColor, sf::Color activeColor,
 	sf::Color outlineIdleColor, sf::Color outlineHoverColor, sf::Color outlineActiveColor,
 	short unsigned id)
@@ -20,7 +21,7 @@ gui::Button::Button(float x, float y, float width, float height,
 	this->text.setFont(*this->font);
 	this->text.setString(text);
 	this->text.setFillColor(sf::Color::White);
-	this->text.setCharacterSize(20);
+	this->text.setCharacterSize(characterSize);
 	this->text.setPosition(
 		this->shape.getPosition().x + (this->shape.getGlobalBounds().width / 2.f) - this->text.getGlobalBounds().width / 2.f,
 		this->shape.getPosition().y + (this->shape.getGlobalBounds().height / 2.f) - this->text.getGlobalBounds().height / 2.f
@@ -114,6 +115,7 @@ void gui::Button::render(sf::RenderTarget& target)
 	target.draw(this->text);
 }
 
+//DROP DOWN LIST ==============================================================================
 gui::DropDownList::DropDownList(float x, float y, float width, float height, 
 	sf::Font& font, std::string list[], 
 	unsigned nrOfElements, unsigned default_index)
@@ -123,7 +125,7 @@ gui::DropDownList::DropDownList(float x, float y, float width, float height,
 
 	this->activeElement = new gui::Button(
 		x, y, width, height,
-		&this->font, list[default_index],
+		&this->font, list[default_index], 20,
 		sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 200), sf::Color(20, 20, 20, 200),
 		sf::Color(255, 255, 255, 200), sf::Color(255, 255, 255, 255), sf::Color(20, 20, 20, 50)
 	);
@@ -133,7 +135,7 @@ gui::DropDownList::DropDownList(float x, float y, float width, float height,
 		this->list.push_back(
 			new gui::Button(
 				x, y + ((i+1) * height), width, height,
-				&this->font, list[i],
+				&this->font, list[i], 20,
 				sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 200), sf::Color(20, 20, 20, 200),
 				sf::Color(255, 255, 255, 0), sf::Color(255, 255, 255, 0), sf::Color(20, 20, 20, 0),
 				i
@@ -214,4 +216,130 @@ void gui::DropDownList::render(sf::RenderTarget& target)
 			i->render(target);
 		}
 	}
+}
+
+
+//TEXTURE SELECTOR ==============================================================================
+gui::TextureSelector::TextureSelector(float x, float y, float width, float height,
+	float gridSize, const sf::Texture* texture_sheet, 
+	sf::Font& font, std::string text)
+	: keytimeMax(1.f), keytime(0.f)
+{
+	this->gridSize = gridSize;
+	this->active = false;
+	this->hidden = false;
+	float offset = 40.f;
+
+	this->bounds.setSize(sf::Vector2f(width, height));
+	this->bounds.setPosition(x + offset, y);
+	this->bounds.setFillColor(sf::Color(50, 50, 50, 100));
+	this->bounds.setOutlineThickness(1.f);
+	this->bounds.setOutlineColor(sf::Color(255, 255, 255, 200));
+
+	this->sheet.setTexture(*texture_sheet);
+	this->sheet.setPosition(x + offset, y);
+
+	if (this->sheet.getGlobalBounds().width > this->bounds.getGlobalBounds().width)
+	{
+		this->sheet.setTextureRect(sf::IntRect(0, 0, this->bounds.getGlobalBounds().width, this->sheet.getGlobalBounds().height));
+	}
+	if (this->sheet.getGlobalBounds().height > this->bounds.getGlobalBounds().height)
+	{
+		this->sheet.setTextureRect(sf::IntRect(0, 0, this->sheet.getGlobalBounds().width, this->bounds.getGlobalBounds().height));
+	}
+
+	this->selector.setPosition(x + offset, y);
+	this->selector.setSize(sf::Vector2f(gridSize, gridSize));
+	this->selector.setFillColor(sf::Color::Transparent);
+	this->selector.setOutlineThickness(1.f);
+	this->selector.setOutlineColor(sf::Color::Red);
+
+	this->textureRect.width = static_cast<int>(gridSize);
+	this->textureRect.height = static_cast<int>(gridSize);
+
+	this->hide_btn = new gui::Button(x, y, 20.f, 20.f,
+		&font, text, 10,
+		sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 255), sf::Color(20, 20, 20, 200));;
+}
+
+gui::TextureSelector::~TextureSelector()
+{
+	delete this->hide_btn;
+}
+
+const bool& gui::TextureSelector::getActive() const
+{
+	return this->active;
+}
+
+const sf::IntRect& gui::TextureSelector::getTextureRect() const
+{
+	return this->textureRect;
+}
+
+const bool gui::TextureSelector::getKeytime()
+{
+	if (this->keytime >= keytimeMax)
+	{
+		this->keytime = 0.f;
+		return true;
+	}
+	return false;
+}
+
+void gui::TextureSelector::updateKeytime(const float& dt)
+{
+	if (this->keytime < this->keytimeMax)
+		this->keytime += 10.f * dt;
+}
+
+void gui::TextureSelector::update(const sf::Vector2i& mousePosWindow, const float& dt)
+{
+	this->updateKeytime(dt);
+	this->hide_btn->update(static_cast<sf::Vector2f>(mousePosWindow));
+
+	if (this->hide_btn->isPressed() && this->getKeytime())
+	{
+		if (this->hidden)
+			this->hidden = false;
+		else
+			this->hidden = true;
+	}
+
+	if (!this->hidden)
+	{
+		if (this->bounds.getGlobalBounds().contains(static_cast<sf::Vector2f>(mousePosWindow)))
+			this->active = true;
+		else
+			this->active = false;
+
+		if (this->active)
+		{
+			this->mousePosGrid.x = (mousePosWindow.x - static_cast<int>(this->bounds.getPosition().x)) / static_cast<unsigned>(this->gridSize);
+			this->mousePosGrid.y = (mousePosWindow.y - static_cast<int>(this->bounds.getPosition().y)) / static_cast<unsigned>(this->gridSize);
+
+			this->selector.setPosition(
+				this->bounds.getPosition().x + this->mousePosGrid.x * this->gridSize,
+				this->bounds.getPosition().y + this->mousePosGrid.y * this->gridSize
+			);
+
+			this->textureRect.left = static_cast<int>(this->selector.getPosition().x - this->bounds.getPosition().x);
+			this->textureRect.top = static_cast<int>(this->selector.getPosition().y - this->bounds.getPosition().y);
+		}
+	}
+}
+
+void gui::TextureSelector::render(sf::RenderTarget& target)
+{
+
+	if (!this->hidden)
+	{
+		target.draw(this->bounds);
+		target.draw(this->sheet);
+
+		if (this->active)
+			target.draw(this->selector);
+	}
+
+	this->hide_btn->render(target);
 }

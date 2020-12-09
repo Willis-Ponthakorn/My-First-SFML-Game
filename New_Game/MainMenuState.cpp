@@ -54,19 +54,19 @@ void MainMenuState::initKeybinds()
 void MainMenuState::initButtons()
 {
 	this->buttons["GAME_STATE"] = new gui::Button(465.f, 270.f, 150.f, 50.f,
-		&this->font, "New Game",
+		&this->font, "New Game", 20,
 		sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 255), sf::Color(20, 20, 20, 200));
 
 	this->buttons["SETTING_STATE"] = new gui::Button(465.f, 370.f, 150.f, 50.f,
-		&this->font, "Setting",
+		&this->font, "Setting", 20,
 		sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 255), sf::Color(20, 20, 20, 200));
 
 	this->buttons["EDITOR_STATE"] = new gui::Button(465.f, 470.f, 150.f, 50.f,
-		&this->font, "Editor",
+		&this->font, "Editor", 20,
 		sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 255), sf::Color(20, 20, 20, 200));
 
 	this->buttons["EXIT_STATE"] = new gui::Button(465.f, 570.f, 150.f, 50.f,
-		&this->font, "Leave",
+		&this->font, "Leave", 20,
 		sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 255), sf::Color(20, 20, 20, 200));
 }
 
