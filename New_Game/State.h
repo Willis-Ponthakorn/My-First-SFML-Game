@@ -4,12 +4,29 @@
 #include "Player.h"
 #include "GameSettings.h"
 
+class Player;
+class GameSettings;
+class State;
+
+class StateData
+{
+public:
+	StateData() {};
+
+	float gridSize;
+	sf::RenderWindow* window;
+	GameSettings* gSettings;
+	std::map<std::string, int>* supportedKeys;
+	std::stack<State*>* states;
+};
+
 class State
 {
 private:
 
 
 protected:
+	StateData* stateData;
 	std::stack<State*>* states;
 	sf::RenderWindow* window;
 	std::map<std::string, int>* supportedKeys;
@@ -18,6 +35,7 @@ protected:
 	bool paused;
 	float keytime;
 	float keytimeMax;
+	float girdSize;
 
 	sf::Vector2i mousePosScreen;
 	sf::Vector2i mousePosWindow;
@@ -28,7 +46,7 @@ protected:
 	virtual void initKeybinds() = 0;
 
 public:
-	State(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states);
+	State(StateData* state_data);
 	virtual ~State();
 
 	const bool& getQuit() const;

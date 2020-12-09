@@ -17,7 +17,7 @@ private:
     Player* player;
     sf::Texture texture;
 
-    TileMap map;
+    TileMap* tileMap;
 
     void initBackground();
     void initKeybinds();
@@ -25,9 +25,10 @@ private:
     void initTexture();
     void initPauseMenu();
     void initPlayer();
+    void initTileMap();
 
 public:
-    GameState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states);
+    GameState(StateData* state_data);
     virtual ~GameState();
 
     void updateInput(const float& dt);

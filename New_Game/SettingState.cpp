@@ -16,7 +16,7 @@ void SettingState::initBackground()
 		)
 	);
 
-	if (!this->bgTexture.loadFromFile("res/image/gameBackground2.png"))
+	if (!this->bgTexture.loadFromFile("res/image/gameBackground.png"))
 	{
 		throw "ERROR::MAINMENUSTATE::FAILED_TO_LOAD_BACKGROUND_TEXTURE";
 	}
@@ -62,24 +62,24 @@ void SettingState::initGui()
 		sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 255), sf::Color(20, 20, 20, 200));
 
 	std::string li[] = { "0%","25%","50%","75%","100%" };
-	this->dropDownLists["SOUND"] = new gui::DropDownList(465.f, 270.f, 150.f, 50.f, font, li, 5);
+	this->dropDownLists["SOUND"] = new gui::DropDownList(100.f, 100.f, 150.f, 50.f, font, li, 5);
 }
 
 void SettingState::initText()
 {
 	this->optionsText.setFont(this->font);
-	this->optionsText.setPosition(sf::Vector2f(100.f, 270.f));
+	this->optionsText.setPosition(sf::Vector2f(100.f, 50.f));
 	this->optionsText.setCharacterSize(40);
 	this->optionsText.setFillColor(sf::Color(255, 255, 255, 200));
 
 
 	this->optionsText.setString(
-		"Volume \n\nVsync \n\n"
+		"Volume \tVsync \t"
 	);
 }
 
-SettingState::SettingState(sf::RenderWindow* window, GameSettings& gSettings, std::map<std::string, int>* supportedKeys, std::stack<State*>* states)
-	: State(window, supportedKeys, states), gSettings(gSettings)
+SettingState::SettingState(StateData* state_data)
+	: State(state_data)
 {
 	this->initVariables();
 	this->initBackground();
@@ -123,7 +123,7 @@ void SettingState::updateGui(const float& dt)
 
 	if (this->buttons["APPLY"]->isPressed())
 	{
-		this->window->create(this->gSettings.resolution, this->gSettings.title, sf::Style::Titlebar | sf::Style::Close);
+		this->window->create(this->stateData->gSettings->resolution, this->stateData->gSettings->title, sf::Style::Titlebar | sf::Style::Close);
 	}
 
 	for (auto& it : this->dropDownLists)

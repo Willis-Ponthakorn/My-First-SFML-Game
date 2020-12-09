@@ -66,26 +66,34 @@ void GameState::initPlayer()
 	this->player = new Player(0, 600, this->textures["PLAYER_SHEET"]);
 }
 
-GameState::GameState(sf::RenderWindow* window, std::map<std::string, int>* supportedKeys, std::stack<State*>* states)
-	: State(window, supportedKeys, states)
+void GameState::initTileMap()
+{
+	this->tileMap = new TileMap(this->stateData->gridSize, 10, 10);
+}
+
+GameState::GameState(StateData* state_data)
+	: State(state_data)
 {
 	this->initBackground();
 	this->initKeybinds();
 	this->initFonts();
 	this->initTexture();
 	this->initPauseMenu();
+
 	this->initPlayer();
+	this->initTileMap();
 }
 
 GameState::~GameState()
 {
 	delete this->pmenu;
 	delete this->player;
+	delete this->tileMap;
 }
 
 void GameState::updateInput(const float& dt)
 {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("CLOSE"))) && this->getKeytime())
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("CLOSE"))))
 	{
 		if (!this->paused)
 			this->pauseState();
@@ -108,7 +116,7 @@ void GameState::updatePlayerInput(const float& dt)
 
 void GameState::updatePauseMenuButtons()
 {
-	if (this->pmenu->isButtonPressed("QUIT"))
+	if (this->pmenu->isButtonPressed("QUIT") && this->getKeytime())
 		this->endState();
 }
 
@@ -138,7 +146,7 @@ void GameState::render(sf::RenderTarget* target)
 
 	target->draw(this->background);
 
-	//this->map.render(*target);
+	//this->tileMap->render(*target);
 
 	this->player->render(*target);
 

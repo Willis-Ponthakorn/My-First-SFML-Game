@@ -10,7 +10,6 @@ class MainMenuState :
     public State
 {
 private:
-    GameSettings& gSettings;
     sf::Texture bgTexture;
     sf::RectangleShape background;
     sf::Font font;
@@ -24,7 +23,7 @@ private:
     void initButtons();
 
 public:
-    MainMenuState(sf::RenderWindow* window, GameSettings& gSettings, std::map<std::string, int>* supportedKeys, std::stack<State*>* states);
+    MainMenuState(StateData* state_data);
     virtual ~MainMenuState();
 
     void updateInput(const float& dt);

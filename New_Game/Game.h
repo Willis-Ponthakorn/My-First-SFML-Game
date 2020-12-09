@@ -7,6 +7,7 @@ class Game
 {
 private:
 	GameSettings gSettings;
+	StateData stateData;
 	sf::RenderWindow* window;
 	sf::Event event;
 
@@ -17,10 +18,13 @@ private:
 
 	std::map<std::string, int> supportedKeys;
 
+	float gridSize;
+
 	void initVariables();
 	void initGameSettings();
 	void initWindow();
 	void initKeys();
+	void initStateData();
 	void initStates();
 
 
