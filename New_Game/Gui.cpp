@@ -70,11 +70,11 @@ void gui::Button::setId(const short unsigned id)
 }
 
 
-void gui::Button::update(const sf::Vector2f& mousePos)
+void gui::Button::update(const sf::Vector2i& mousePosWindow)
 {
 	this->buttonState = BTN_IDLE;
 
-	if (this->shape.getGlobalBounds().contains(mousePos))
+	if (this->shape.getGlobalBounds().contains(static_cast<sf::Vector2f>(mousePosWindow)))
 	{
 		this->buttonState = BTN_HOVER;
 
@@ -130,7 +130,7 @@ gui::DropDownList::DropDownList(float x, float y, float width, float height,
 		sf::Color(255, 255, 255, 200), sf::Color(255, 255, 255, 255), sf::Color(20, 20, 20, 50)
 	);
 
-	for (size_t i = 0; i < nrOfElements; i++)
+	for (unsigned i = 0; i < nrOfElements; i++)
 	{
 		this->list.push_back(
 			new gui::Button(
@@ -175,11 +175,11 @@ void gui::DropDownList::updateKeytime(const float& dt)
 		this->keytime += 10.f * dt;
 }
 
-void gui::DropDownList::update(const sf::Vector2f& mousePos, const float& dt)
+void gui::DropDownList::update(const sf::Vector2i& mousePosWindow, const float& dt)
 {
 	this->updateKeytime(dt);
 
-	this->activeElement->update(mousePos);
+	this->activeElement->update(mousePosWindow);
 
 	if (this->activeElement->isPressed() && this->getKeytime())
 	{
@@ -193,7 +193,7 @@ void gui::DropDownList::update(const sf::Vector2f& mousePos, const float& dt)
 	{
 		for (auto& i : this->list)
 		{
-			i->update(mousePos);
+			i->update(mousePosWindow);
 
 			if (i->isPressed() && this->getKeytime())
 			{
@@ -241,11 +241,11 @@ gui::TextureSelector::TextureSelector(float x, float y, float width, float heigh
 
 	if (this->sheet.getGlobalBounds().width > this->bounds.getGlobalBounds().width)
 	{
-		this->sheet.setTextureRect(sf::IntRect(0, 0, this->bounds.getGlobalBounds().width, this->sheet.getGlobalBounds().height));
+		this->sheet.setTextureRect(sf::IntRect(0, 0, static_cast<int>(this->bounds.getGlobalBounds().width), static_cast<int>(this->sheet.getGlobalBounds().height)));
 	}
 	if (this->sheet.getGlobalBounds().height > this->bounds.getGlobalBounds().height)
 	{
-		this->sheet.setTextureRect(sf::IntRect(0, 0, this->sheet.getGlobalBounds().width, this->bounds.getGlobalBounds().height));
+		this->sheet.setTextureRect(sf::IntRect(0, 0, static_cast<int>(this->sheet.getGlobalBounds().width), static_cast<int>(this->bounds.getGlobalBounds().height)));
 	}
 
 	this->selector.setPosition(x + offset, y);
@@ -296,7 +296,7 @@ void gui::TextureSelector::updateKeytime(const float& dt)
 void gui::TextureSelector::update(const sf::Vector2i& mousePosWindow, const float& dt)
 {
 	this->updateKeytime(dt);
-	this->hide_btn->update(static_cast<sf::Vector2f>(mousePosWindow));
+	this->hide_btn->update(mousePosWindow);
 
 	if (this->hide_btn->isPressed() && this->getKeytime())
 	{

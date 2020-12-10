@@ -27,13 +27,17 @@ private:
 
     sf::RectangleShape sidebar;
 
-    sf::IntRect textureRect;
     sf::RectangleShape selectorRect;
 
     gui::TextureSelector* textureSelector;
 
+    sf::IntRect textureRect;
     bool collision;
     short type;
+    int layer;
+
+    float camPosX;
+    float camPosY;
 
     void initVariables();
     void initView();

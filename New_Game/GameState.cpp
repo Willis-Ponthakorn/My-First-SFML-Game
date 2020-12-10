@@ -1,6 +1,48 @@
 #include "stdafx.h"
 #include "GameState.h"
 
+void GameState::initVariables()
+{
+	this->camPosX = 0.f;
+	this->camPosY = 0.f;
+	this->mapPosXLeft = 0.f;
+	this->mapPosYUp = 0.f;
+	this->mapPosXRight = 0.f;
+	this->mapPosYDown = 0.f;
+}
+
+void GameState::initDeferredRender()
+{
+	this->renderTexture.create(
+		this->stateData->gSettings->resolution.width, 
+		this->stateData->gSettings->resolution.height
+	);
+
+	this->renderSprite.setTexture(this->renderTexture.getTexture());
+	this->renderSprite.setTextureRect(sf::IntRect(
+		0,
+		0,
+		this->stateData->gSettings->resolution.width,
+		this->stateData->gSettings->resolution.height)
+	);
+}
+
+void GameState::initView()
+{
+	this->view.setSize(
+		sf::Vector2f(
+			static_cast<float>(this->stateData->gSettings->resolution.width),
+			static_cast<float>(this->stateData->gSettings->resolution.height)
+		)
+	);
+	this->view.setCenter(
+		sf::Vector2f(
+			static_cast<float>(this->stateData->gSettings->resolution.width) / 2.f,
+			static_cast<float>(this->stateData->gSettings->resolution.height) / 2.f
+		)
+	);
+}
+
 void GameState::initBackground()
 {
 	this->background.setSize(
@@ -63,17 +105,20 @@ void GameState::initPauseMenu()
 
 void GameState::initPlayer()
 {
-	this->player = new Player(0, 600, this->textures["PLAYER_SHEET"]);
+	this->player = new Player(100, 600, this->textures["PLAYER_SHEET"]);
 }
 
 void GameState::initTileMap()
 {
-	this->tileMap = new TileMap(this->stateData->gridSize, 10, 10, "res/image/Tileset3.png");
+	this->tileMap = new TileMap(this->stateData->gridSize, 40, 30, "res/image/Tileset3.png");
+	this->tileMap->loadFromFile("text.eosmp");
 }
 
 GameState::GameState(StateData* state_data)
 	: State(state_data)
 {
+	this->initDeferredRender();
+	this->initView();
 	this->initBackground();
 	this->initKeybinds();
 	this->initFonts();
@@ -89,6 +134,38 @@ GameState::~GameState()
 	delete this->pmenu;
 	delete this->player;
 	delete this->tileMap;
+}
+
+void GameState::updateView(const float& dt)
+{
+	this->mapPosXLeft = this->camPosX * this->stateData->gSettings->resolution.width;
+	this->mapPosYUp = this->camPosY * this->stateData->gSettings->resolution.height;
+	this->mapPosXRight = (this->camPosX + 1.f) * this->stateData->gSettings->resolution.width;
+	this->mapPosYDown = (this->camPosY + 1.f) * this->stateData->gSettings->resolution.height;
+	//Cam move right
+	if (this->player->getPosition().x > this->mapPosXRight)
+	{
+		this->view.move(static_cast<float>(this->stateData->gSettings->resolution.width), 0.f);
+		camPosX++;
+	}
+	//Cam move left
+	if (this->player->getPosition().x < this->mapPosXLeft)
+	{
+		this->view.move(static_cast<float>(this->stateData->gSettings->resolution.width) * -1.f, 0.f);
+		camPosX--;
+	}
+	//Cam move up
+	if (this->player->getPosition().y < this->mapPosYUp)
+	{
+		this->view.move(0.f, static_cast<float>(this->stateData->gSettings->resolution.height) * -1.f);
+		camPosY--;
+	}
+	//Cam move down
+	if (this->player->getPosition().y > this->mapPosYDown)
+	{
+		this->view.move(0.f, static_cast<float>(this->stateData->gSettings->resolution.height));
+		camPosY++;
+	}
 }
 
 void GameState::updateInput(const float& dt)
@@ -120,21 +197,38 @@ void GameState::updatePauseMenuButtons()
 		this->endState();
 }
 
+void GameState::updateBackgroundPosition(float pos_x, float pos_y)
+{
+	this->background.setPosition(pos_x, pos_y);
+}
+
+void GameState::updateTileMap(const float& dt)
+{
+	this->tileMap->update();
+	this->tileMap->updateCollision(this->player, dt);
+}
+
 void GameState::update(const float& dt)
 {
-	this->updateMousePosition();
+	this->updateMousePosition(&this->view);
 	this->updateKeytime(dt);
 	this->updateInput(dt);
 
 	if (!this->paused)
 	{
-		this->updatePlayerInput(dt);
+		this->updateBackgroundPosition(this->mapPosXLeft, this->mapPosYUp);
 
-		this->player->update(dt);
+		this->updateView(dt);
+
+		this->updatePlayerInput(dt);
+		
+		this->updateTileMap(dt);
+		
+		this->player->update(dt);	
 	}
 	else
 	{
-		this->pmenu->update(this->mousePosView);
+		this->pmenu->update(this->mousePosWindow);
 		this->updatePauseMenuButtons();
 	}
 }
@@ -143,15 +237,24 @@ void GameState::render(sf::RenderTarget* target)
 {
 	if (!target)
 		target = this->window;
+	
+	this->renderTexture.clear();
 
-	target->draw(this->background);
+	this->renderTexture.setView(this->view);
 
-	//this->tileMap->render(*target);
+	this->renderTexture.draw(this->background);
 
-	this->player->render(*target);
+	this->tileMap->render(this->renderTexture, this->player->getGridPosition(static_cast<int>(this->stateData->gridSize)));
+
+	this->player->render(this->renderTexture);
 
 	if (this->paused)
 	{
-		this->pmenu->render(*target);
+		this->renderTexture.setView(this->renderTexture.getDefaultView());
+		this->pmenu->render(this->renderTexture);
 	}
+
+	this->renderTexture.display();
+	this->renderSprite.setTexture(this->renderTexture.getTexture());
+	target->draw(this->renderSprite);
 }

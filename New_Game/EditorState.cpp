@@ -6,20 +6,24 @@ void EditorState::initVariables()
 	this->textureRect = sf::IntRect(0, 0, static_cast<int>(this->stateData->gridSize), static_cast<int>(this->stateData->gridSize));
 	this->collision = false;
 	this->type = TileTypes::DEFAULT;
+	this->layer = 0;
+
+	this->camPosX = 0.f;
+	this->camPosY = 0.f;
 }
 
 void EditorState::initView()
 {
 	this->view.setSize(
 		sf::Vector2f(
-			this->stateData->gSettings->resolution.width,
-			this->stateData->gSettings->resolution.height
+			static_cast<float>(this->stateData->gSettings->resolution.width),
+			static_cast<float>(this->stateData->gSettings->resolution.height)
 		)
 	);
 
 	this->view.setCenter(
-		this->stateData->gSettings->resolution.width / 2.f,
-		this->stateData->gSettings->resolution.height / 2.f
+		static_cast<float>(this->stateData->gSettings->resolution.width) / 2.f,
+		static_cast<float>(this->stateData->gSettings->resolution.height) / 2.f
 	);
 }
 
@@ -81,14 +85,14 @@ void EditorState::initGui()
 {
 	this->sidebar.setSize(sf::Vector2f(22.f, static_cast<float>(this->stateData->gSettings->resolution.height)));
 	this->sidebar.setFillColor(sf::Color(50, 50, 50, 100));
-	this->sidebar.setOutlineThickness(1.f);
+	this->sidebar.setOutlineThickness(-1.f);
 	this->sidebar.setOutlineColor(sf::Color(200, 200, 200, 150));
 	
 
 	this->selectorRect.setSize(sf::Vector2f(this->stateData->gridSize,this->stateData->gridSize));
 	
 	this->selectorRect.setFillColor(sf::Color(255, 255, 255, 150));
-	this->selectorRect.setOutlineThickness(1.f);
+	this->selectorRect.setOutlineThickness(-1.f);
 	this->selectorRect.setOutlineColor(sf::Color::Green);
 
 	this->selectorRect.setTexture(this->tileMap->getTileSheet());
@@ -150,13 +154,25 @@ void EditorState::updateInput(const float& dt)
 void EditorState::updateEditorInput(const float& dt)
 {
 	//Move view
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && this->getKeytime())
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_CAM_RIGHT"))) && this->getKeytime())
 	{
-		this->view.move(this->stateData->gSettings->resolution.width, 0);
+		this->view.move(static_cast<float>(this->stateData->gSettings->resolution.width), 0.f);
+		camPosX++;
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && this->getKeytime())
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_CAM_LEFT"))) && this->getKeytime())
 	{
-		this->view.move(this->stateData->gSettings->resolution.width * -1.f, 0);
+		this->view.move(static_cast<float>(this->stateData->gSettings->resolution.width) * -1.f, 0.f);
+		camPosX--;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_CAM_UP"))) && this->getKeytime())
+	{
+		this->view.move(0.f, static_cast<float>(this->stateData->gSettings->resolution.height) * -1.f);
+		camPosY--;
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_CAM_DOWN"))) && this->getKeytime())
+	{
+		this->view.move(0.f, static_cast<float>(this->stateData->gSettings->resolution.height));
+		camPosY++;
 	}
 
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && this->getKeytime())
@@ -204,7 +220,7 @@ void EditorState::updateButtons()
 {
 	for (auto& it : this->buttons)
 	{
-		it.second->update(this->mousePosView);
+		it.second->update(this->mousePosWindow);
 	}
 }
 
@@ -224,7 +240,9 @@ void EditorState::updateGui(const float& dt)
 		<< this->mousePosGrid.x << " " << this->mousePosGrid.y << "\n"
 		<< this->textureRect.left << " " << this->textureRect.top << "\n"
 		<< "Collision: " << this->collision << "\n"
-		<< "Type: " << this->type;
+		<< "Type: " << this->type << "\n"
+		<< "MapPos: " << this->camPosX << " " << this->camPosY << "\n"
+		<< "Tiles: " << this->tileMap->getLayerSize(this->mousePosGrid.x, this->mousePosGrid.y, this->layer);
 	this->cusorText.setString(ss.str());
 
 	
@@ -244,7 +262,7 @@ void EditorState::updatePauseMenuButtons()
 
 void EditorState::update(const float& dt)
 {
-	this->updateMousePosition();
+	this->updateMousePosition(&this->view);
 	this->updateKeytime(dt);
 	this->updateInput(dt);
 
@@ -256,7 +274,7 @@ void EditorState::update(const float& dt)
 	}
 	else
 	{
-		this->pmenu->update(this->mousePosView);
+		this->pmenu->update(this->mousePosWindow);
 		this->updatePauseMenuButtons();
 	}
 }
@@ -271,14 +289,18 @@ void EditorState::renderButtons(sf::RenderTarget& target)
 
 void EditorState::renderGui(sf::RenderTarget& target)
 {
-	if(!this->textureSelector->getActive())
+	if (!this->textureSelector->getActive())
+	{
+		target.setView(this->view);
 		target.draw(this->selectorRect);
+	}
 
+	target.setView(this->window->getDefaultView());
 	this->textureSelector->render(target);
-
-	target.draw(this->cusorText);
-
 	target.draw(this->sidebar);
+
+	target.setView(this->view);
+	target.draw(this->cusorText);
 }
 
 void EditorState::render(sf::RenderTarget* target)
@@ -287,14 +309,16 @@ void EditorState::render(sf::RenderTarget* target)
 		target = this->window;
 	
 	target->setView(this->view);
-	this->tileMap->render(*target);
+	this->tileMap->render(*target, this->mousePosGrid);
 
 	target->setView(this->window->getDefaultView());
 	this->renderButtons(*target);
+
 	this->renderGui(*target);
 
 	if (this->paused)
 	{
+		target->setView(this->window->getDefaultView());
 		this->pmenu->render(*target);
 	}
 

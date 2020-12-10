@@ -63,60 +63,66 @@ const bool MovementComponent::getState(const short unsigned state) const
 	return false;
 }
 
+void MovementComponent::stopVelocity()
+{
+	this->velocity.x = 0.f;
+	this->velocity.y = 0.f;
+}
+
+void MovementComponent::stopVelocityX()
+{
+	this->velocity.x = 0.f;
+}
+
+void MovementComponent::stopVelocityY()
+{
+	this->velocity.y = 0.f;
+}
+
 void MovementComponent::move(const float dir_x, const float dir_y, const float& dt)
 {
 	this->velocity.x += this->acceleration * dir_x;
-
-	if (this->velocity.x > 0.f)
-	{
-		if (this->velocity.x > this->maxVelocity)
-			this->velocity.x = this->maxVelocity;
-	}
-	else if (this->velocity.x < 0.f)
-	{
-		if (this->velocity.x < -this->maxVelocity)
-			this->velocity.x = -this->maxVelocity;
-	}
 	this->velocity.y += this->acceleration * dir_y;
-	if (this->velocity.y > 0.f)
-	{
-		if (this->velocity.y > this->maxVelocity)
-			this->velocity.y = this->maxVelocity;
-	}
-	else if (this->velocity.y < 0.f)
-	{
-		if (this->velocity.y < -this->maxVelocity)
-			this->velocity.y = -this->maxVelocity;
-	}
-
-
 }
 
 void MovementComponent::update(const float& dt)
 {
 	if (this->velocity.x > 0.f)
 	{
+		if (this->velocity.x > this->maxVelocity)
+			this->velocity.x = this->maxVelocity;
+
 		this->velocity.x -= deceleration;
 		if (this->velocity.x < 0.f)
 			this->velocity.x = 0.f;
 	}
 	else if (this->velocity.x < 0.f)
 	{
+		if (this->velocity.x < -this->maxVelocity)
+			this->velocity.x = -this->maxVelocity;
+
 		this->velocity.x += deceleration;
 		if (this->velocity.x > 0.f)
 			this->velocity.x = 0.f;
 	}
 	if (this->velocity.y > 0.f)
 	{
+		if (this->velocity.y > this->maxVelocity)
+			this->velocity.y = this->maxVelocity;
+
 		this->velocity.y -= deceleration;
 		if (this->velocity.y < 0.f)
 			this->velocity.y = 0.f;
 	}
 	else if (this->velocity.y < 0.f)
 	{
+		if (this->velocity.y < -this->maxVelocity)
+			this->velocity.y = -this->maxVelocity;
+
 		this->velocity.y += deceleration;
 		if (this->velocity.y > 0.f)
 			this->velocity.y = 0.f;
 	}
+
 	this->sprite.move(this->velocity * dt);
 }
