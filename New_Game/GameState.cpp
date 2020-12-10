@@ -94,6 +94,10 @@ void GameState::initTexture()
 	{
 		throw "ERROR::GAMESTATE::COULD_NOT_LOAD_PLAYER_TEXTURE";
 	}
+	if (!this->textures["BULLET"].loadFromFile("res/image/Bullet.png"))
+	{
+		throw "ERROR::GAMESTATE::COULD_NOT_LOAD_BULLET_TEXTURE";
+	}
 }
 
 void GameState::initPauseMenu()
@@ -110,7 +114,7 @@ void GameState::initPlayer()
 
 void GameState::initTileMap()
 {
-	this->tileMap = new TileMap(this->stateData->gridSize, 40, 30, "res/image/Tileset3.png");
+	this->tileMap = new TileMap(this->stateData->gridSize, 330, 220, "res/image/Tileset3.png");
 	this->tileMap->loadFromFile("text.eosmp");
 }
 
@@ -189,6 +193,8 @@ void GameState::updatePlayerInput(const float& dt)
 		this->player->move(0.f, -1.f, dt);
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_DOWN"))))
 		this->player->move(0.f, 1.f, dt);
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("SHOOT"))))
+		this->player->updateAttack();
 }
 
 void GameState::updatePauseMenuButtons()
@@ -247,6 +253,8 @@ void GameState::render(sf::RenderTarget* target)
 	this->tileMap->render(this->renderTexture, this->player->getGridPosition(static_cast<int>(this->stateData->gridSize)));
 
 	this->player->render(this->renderTexture);
+
+	this->tileMap->renderDeferred(this->renderTexture);
 
 	if (this->paused)
 	{

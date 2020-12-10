@@ -3,7 +3,7 @@
 
 void Player::initVariables()
 {
-
+	this->attack = false;
 }
 
 void Player::initComponents()
@@ -30,9 +30,14 @@ Player::~Player()
 
 }
 
+const bool Player::getAttack() const
+{
+	return this->attack;
+}
+
 void Player::updateAttack()
 {
-
+	this->attack = true;
 }
 
 void Player::updateAnimation(const float& dt)

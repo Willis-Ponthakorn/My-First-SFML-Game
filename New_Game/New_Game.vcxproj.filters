@@ -87,6 +87,12 @@
     <ClCompile Include="GameSettings.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="Bullet.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="Boss.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -139,6 +145,12 @@
     </ClInclude>
     <ClInclude Include="GameSettings.h">
       <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Bullet.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="Boss.h">
+      <Filter>Entity</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

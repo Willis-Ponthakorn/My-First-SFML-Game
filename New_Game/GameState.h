@@ -26,6 +26,7 @@ private:
     PauseMenu* pmenu;
 
     Player* player;
+    Bullet* bullet;
     sf::Texture texture;
 
     TileMap* tileMap;

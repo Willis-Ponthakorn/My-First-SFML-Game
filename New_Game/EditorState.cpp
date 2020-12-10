@@ -107,7 +107,7 @@ void EditorState::initGui()
 
 void EditorState::initTileMap()
 {
-	this->tileMap = new TileMap(this->stateData->gridSize, 40, 30, "res/image/Tileset3.png");
+	this->tileMap = new TileMap(this->stateData->gridSize, 330, 220, "res/image/Tileset3.png");
 }
 
 EditorState::EditorState(StateData* state_data)
@@ -310,6 +310,7 @@ void EditorState::render(sf::RenderTarget* target)
 	
 	target->setView(this->view);
 	this->tileMap->render(*target, this->mousePosGrid);
+	this->tileMap->renderDeferred(*target);
 
 	target->setView(this->window->getDefaultView());
 	this->renderButtons(*target);
