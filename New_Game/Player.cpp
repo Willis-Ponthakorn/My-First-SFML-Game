@@ -3,7 +3,7 @@
 
 void Player::initVariables()
 {
-	this->attack = false;
+
 }
 
 void Player::initComponents()
@@ -18,7 +18,7 @@ Player::Player(float x, float y, sf::Texture& texture_sheet)
 	this->setPosition(x, y);
 
 	this->createHitboxComponent(this->sprite, 0.f, 0.f, 32.f, 36.f);
-	this->createMovementComponent(250.f, 62.f, 31.f);
+	this->createMovementComponent(250.f, 62.f, 31.f, 125.f, 2, true);
 	this->createAnimationComponent(texture_sheet);
 
 	this->animationComponent->addAnimation("IDLE", 20.f, 0, 0, 1, 0, 36, 36);
@@ -28,16 +28,6 @@ Player::Player(float x, float y, sf::Texture& texture_sheet)
 Player::~Player()
 {
 
-}
-
-const bool Player::getAttack() const
-{
-	return this->attack;
-}
-
-void Player::updateAttack()
-{
-	this->attack = true;
 }
 
 void Player::updateAnimation(const float& dt)
@@ -53,8 +43,6 @@ void Player::updateAnimation(const float& dt)
 void Player::update(const float& dt)
 {
 	this->movementComponent->update(dt);
-
-	this->updateAttack();
 
 	this->updateAnimation(dt);
 

@@ -100,6 +100,8 @@ void Game::endApplication()
 void Game::updateDt()
 {
 	this->dt = this->dtClock.restart().asSeconds();
+	if (dt > 1.0f / 20.0f)
+		dt = 1.0f / 20.0f;
 
 }
 

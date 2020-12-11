@@ -3,29 +3,24 @@
 
 #include "Entity.h"
 
-class Bullet:
+class Entity;
+
+class Bullet :
 	public Entity
 {
 private:
-	sf::RectangleShape bullet;
-
 	void initVariables();
 	void initComponents();
 
 	
 public:
-	Bullet(float x, float y, sf::Texture& texture_sheet);
-	virtual ~Bullet();
+    Bullet(float x, float y, sf::Texture& texture_sheet);
+    virtual ~Bullet();
 
-	float getRight();
-	float getLeft();
-	float getTop();
-	float getBottom();
+	void updateAnimation(const float& dt);
+    void update(const float& dt);
 
-	void shoot(float speed);
-
-	void update(const float& dt);
-	void render(sf::RenderWindow& target);
+    void render(sf::RenderTarget& target);
 };
 
 #endif

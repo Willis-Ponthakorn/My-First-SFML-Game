@@ -109,7 +109,7 @@ void GameState::initPauseMenu()
 
 void GameState::initPlayer()
 {
-	this->player = new Player(100, 600, this->textures["PLAYER_SHEET"]);
+	this->player = new Player(100, 0, this->textures["PLAYER_SHEET"]);
 }
 
 void GameState::initTileMap()
@@ -186,15 +186,14 @@ void GameState::updateInput(const float& dt)
 void GameState::updatePlayerInput(const float& dt)
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_LEFT"))))
-		this->player->move(-1.f, 0.f, dt);
+		this->player->move(-1.f, dt);
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_RIGHT"))))
-		this->player->move(1.f, 0.f, dt);
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_UP"))))
-		this->player->move(0.f, -1.f, dt);
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_DOWN"))))
-		this->player->move(0.f, 1.f, dt);
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("SHOOT"))))
-		this->player->updateAttack();
+		this->player->move(1.f, dt);
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("JUMP"))) && this->getKeytime())
+		this->player->jump();
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("SHOOT"))) && this->getKeytime() && this->bullets.size() < 5)
+		this->bullets.push_back(new Bullet(this->player->getPosition().x + 36.f, this->player->getPosition().y + 14.f, this->textures["BULLET"]));
+	
 }
 
 void GameState::updatePauseMenuButtons()
@@ -206,6 +205,25 @@ void GameState::updatePauseMenuButtons()
 void GameState::updateBackgroundPosition(float pos_x, float pos_y)
 {
 	this->background.setPosition(pos_x, pos_y);
+}
+
+void GameState::updateBullet(const float& dt)
+{
+	for (size_t i = 0; i < this->bullets.size(); i++)
+	{
+		this->bullets[i]->move(1.f, dt);
+
+		if (this->bullets[i]->getPosition().x > this->mapPosXRight)
+			this->bullets.erase(bullets.begin() + i);
+		else if (this->bullets[i]->getPosition().x < this->mapPosXLeft)
+			this->bullets.erase(bullets.begin() + i);
+		else if (this->bullets[i]->getPosition().y > this->mapPosYDown)
+			this->bullets.erase(bullets.begin() + i);
+		else if (this->bullets[i]->getPosition().y < this->mapPosYUp)
+			this->bullets.erase(bullets.begin() + i);
+		else if(this->tileMap->getBulletCollision(this->bullets[i], dt))
+			this->bullets.erase(bullets.begin() + i);
+	}
 }
 
 void GameState::updateTileMap(const float& dt)
@@ -227,10 +245,19 @@ void GameState::update(const float& dt)
 		this->updateView(dt);
 
 		this->updatePlayerInput(dt);
+
+		this->updateBullet(dt);
+		
+		this->player->update(dt);
 		
 		this->updateTileMap(dt);
 		
-		this->player->update(dt);	
+			
+
+		for (size_t i = 0; i < this->bullets.size(); i++)
+		{
+			this->bullets[i]->update(dt);
+		}
 	}
 	else
 	{
@@ -253,6 +280,12 @@ void GameState::render(sf::RenderTarget* target)
 	this->tileMap->render(this->renderTexture, this->player->getGridPosition(static_cast<int>(this->stateData->gridSize)));
 
 	this->player->render(this->renderTexture);
+
+	for (size_t i = 0; i < this->bullets.size(); i++)
+	{
+		this->bullets[i]->render(this->renderTexture);
+	}
+	
 
 	this->tileMap->renderDeferred(this->renderTexture);
 

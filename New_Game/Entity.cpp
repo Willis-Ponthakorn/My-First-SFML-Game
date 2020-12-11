@@ -32,9 +32,9 @@ void Entity::createHitboxComponent(sf::Sprite& sprite,
 	this->hitboxComponent = new HitboxComponent(sprite, offset_x, offset_y, width, height);
 }
 
-void Entity::createMovementComponent(const float maxVelocity, const float acceleration, const float deceleration)
+void Entity::createMovementComponent(const float maxVelocity, const float acceleration, const float deceleration, const float jumpHeight, const int maxJumpCount, const bool canJump)
 {
-	this->movementComponent = new MovementComponent(this->sprite, maxVelocity, acceleration, deceleration);
+	this->movementComponent = new MovementComponent(this->sprite, maxVelocity, acceleration, deceleration, jumpHeight, maxJumpCount, canJump);
 }
 
 void Entity::createAnimationComponent(sf::Texture& texture_sheet)
@@ -88,10 +88,22 @@ void Entity::setPosition(const float x, const float y)
 		this->sprite.setPosition(x, y);
 }
 
-void Entity::move(const float dir_x, const float dir_y, const float& dt)
+void Entity::move(const float dir_x, const float& dt)
 {
 	if (this->movementComponent)
-		this->movementComponent->move(dir_x, dir_y, dt);
+		this->movementComponent->move(dir_x, dt);
+}
+
+void Entity::jump()
+{
+	if (this->movementComponent)
+		this->movementComponent->jump();
+}
+
+void Entity::resetJumpCount()
+{
+	if (this->movementComponent)
+		this->movementComponent->resetJumpCount();
 }
 
 void Entity::stopVelocity()
@@ -114,10 +126,10 @@ void Entity::stopVelocityY()
 
 void Entity::update(const float& dt)
 {
-	
+	if (this->movementComponent)
+		this->movementComponent->resetJumpCount();
 }
 
 void Entity::render(sf::RenderTarget& target)
 {
-
 }

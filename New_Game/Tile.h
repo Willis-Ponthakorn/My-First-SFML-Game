@@ -1,7 +1,7 @@
 #ifndef TILE_H
 #define TILE_H
 
-enum TileTypes {DEFAULT = 0, DAMAGING, INFRONT};
+enum TileTypes {DEFAULT = 0, COLLISION, INFRONT, COLLISIONTOP, CHECKPOINT};
 
 class Tile
 {

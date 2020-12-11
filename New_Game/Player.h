@@ -2,6 +2,7 @@
 #define PLAYER_H
 
 #include "Entity.h"
+#include "Bullet.h"
 
 class Entity;
 
@@ -15,12 +16,11 @@ private:
     void initComponents();
 
 public:
+    std::vector<Bullet> bullets;
+
     Player(float x, float y, sf::Texture& texture_sheet);
     virtual ~Player();
 
-    const bool getAttack() const;
-
-    void updateAttack();
     void updateAnimation(const float& dt);
     void update(const float& dt);
 

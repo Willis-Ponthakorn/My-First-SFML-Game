@@ -26,7 +26,8 @@ private:
     PauseMenu* pmenu;
 
     Player* player;
-    Bullet* bullet;
+    std::vector<Bullet*> bullets;
+
     sf::Texture texture;
 
     TileMap* tileMap;
@@ -58,6 +59,7 @@ public:
     void updatePlayerInput(const float& dt);
     void updatePauseMenuButtons();
     void updateBackgroundPosition(float pos_x, float pos_y);
+    void updateBullet(const float& dt);
     void updateTileMap(const float& dt);
     void update(const float& dt);
     void render(sf::RenderTarget* target = nullptr);
