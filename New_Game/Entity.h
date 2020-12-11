@@ -36,6 +36,7 @@ public:
 	virtual const sf::Vector2i getGridPosition(const int gridSizeU) const;
 	virtual const sf::FloatRect getGlobalBounds() const;
 	virtual const sf::FloatRect getNextPositionBounds(const float& dt) const;
+	virtual bool getIntersects(const sf::FloatRect& frect) const;
 
 	virtual void setPosition(const float x, const float y);
 	

@@ -80,6 +80,12 @@ const sf::FloatRect Entity::getNextPositionBounds(const float& dt) const
 	return sf::FloatRect(-1.f, -1.f, -1.f, -1.f);
 }
 
+bool Entity::getIntersects(const sf::FloatRect& frect) const
+{
+	if (this->hitboxComponent)
+		return this->hitboxComponent->intersects(frect);
+}
+
 void Entity::setPosition(const float x, const float y)
 {
 	if (this->hitboxComponent)
