@@ -37,6 +37,8 @@ public:
 	virtual const sf::FloatRect getGlobalBounds() const;
 	virtual const sf::FloatRect getNextPositionBounds(const float& dt) const;
 	virtual bool getIntersects(const sf::FloatRect& frect) const;
+	virtual bool getCanJump() const;
+	virtual int getJumpCount() const;
 
 	virtual void setPosition(const float x, const float y);
 	

@@ -34,6 +34,11 @@ const sf::Vector2f& MovementComponent::getVelocity() const
 	return this->velocity;
 }
 
+const int& MovementComponent::getJumpCount() const
+{
+	return this->jumpCount;
+}
+
 const bool MovementComponent::getState(const short unsigned state) const
 {
 	switch (state)

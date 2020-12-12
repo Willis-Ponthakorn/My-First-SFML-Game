@@ -130,6 +130,8 @@ void MainMenuState::updateButtons()
 
 	if (this->buttons["EDITOR_STATE"]->isPressed())
 	{
+		this->music.stop();
+		this->nowOutMainMenuState();
 		this->states->push(new EditorState(this->stateData));
 	}
 

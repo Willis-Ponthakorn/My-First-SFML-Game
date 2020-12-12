@@ -27,6 +27,7 @@ public:
 	const bool& getCanJump() const;
 	const float& getMaxVelocity() const;
 	const sf::Vector2f& getVelocity() const;
+	const int& getJumpCount() const;
 
 	const bool getState(const short unsigned state) const;
 	void resetJumpCount();

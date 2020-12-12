@@ -88,6 +88,16 @@ bool Entity::getIntersects(const sf::FloatRect& frect) const
 	return this->sprite.getGlobalBounds().intersects(frect);
 }
 
+bool Entity::getCanJump() const
+{
+	return this->movementComponent->getCanJump();
+}
+
+int Entity::getJumpCount() const
+{
+	return this->movementComponent->getJumpCount();
+}
+
 void Entity::setPosition(const float x, const float y)
 {
 	if (this->hitboxComponent)

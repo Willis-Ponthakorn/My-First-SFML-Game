@@ -17,7 +17,7 @@ Bullet::Bullet(float x, float y, sf::Texture& texture_sheet)
 	this->setPosition(x, y);
 
 	this->createHitboxComponent(this->sprite, 0.f, 0.f, 4.f, 4.f);
-	this->createMovementComponent(400.f, 150.f, 0.f, 0.f, 0, false);
+	this->createMovementComponent(500.f, 450.f, 0.f, 0.f, 0, false);
 	this->createAnimationComponent(texture_sheet);
 
 	this->animationComponent->addAnimation("BULLET", 20.f, 0, 0, 0, 0, 4, 4);

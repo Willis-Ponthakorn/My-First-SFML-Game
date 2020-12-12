@@ -36,6 +36,7 @@ public:
 	const sf::Texture* getTileSheet() const;
 	const int getLayerSize(const int x, const int y, const int layer) const;
 	const bool getBulletCollision(Entity* entity, const float& dt);
+	const bool getDamageCollision(Entity* entity, const float& dt);
 
 	void addTile(const int x, const int y, const int z, const sf::IntRect& texture_rect, const bool& collision, const short& type);
 	void removeTile(const int x, const int y, const int z);

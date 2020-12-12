@@ -9,6 +9,8 @@ void GameState::initVariables()
 	this->mapPosYUp = 0.f;
 	this->mapPosXRight = 0.f;
 	this->mapPosYDown = 0.f;
+	this->checkpointPlayer.x = 100.f;
+	this->checkpointPlayer.y = 600.f;
 }
 
 void GameState::initDeferredRender()
@@ -51,11 +53,23 @@ void GameState::initSound()
 	this->music.play();
 	this->music.setLoop(true);
 
-	if(!this->soundeffect.loadFromFile("res/sound/Pew.wav"))
-		throw "ERROR::GAMESTATE::FAILED_TO_LOAD_SOUND_EFFECT";
+	if(!this->soundshoot.loadFromFile("res/sound/Pew.wav"))
+		throw "ERROR::GAMESTATE::FAILED_TO_LOAD_SOUND_SHOOT_EFFECT";
 
-	this->shooteffect.setBuffer(this->soundeffect);
+	if (!this->soundjump1.loadFromFile("res/sound/jump1.wav"))
+		throw "ERROR::GAMESTATE::FAILED_TO_LOAD_SOUND_JUMP1_EFFECT";
+
+	if (!this->soundjump2.loadFromFile("res/sound/jump2.wav"))
+		throw "ERROR::GAMESTATE::FAILED_TO_LOAD_SOUND_JUMP2_EFFECT";
+
+	this->shooteffect.setBuffer(this->soundshoot);
 	this->shooteffect.setVolume(50);
+
+	this->jump1effect.setBuffer(this->soundjump1);
+	this->jump1effect.setVolume(50);
+
+	this->jump2effect.setBuffer(this->soundjump2);
+	this->jump2effect.setVolume(50);
 }
 
 void GameState::initBackground()
@@ -124,7 +138,7 @@ void GameState::initPauseMenu()
 
 void GameState::initPlayer()
 {
-	this->player = new Player(100, 0, this->textures["PLAYER_SHEET"]);
+	this->player = new Player(100, 600, this->textures["PLAYER_SHEET"]);
 }
 
 void GameState::initTileMap()
@@ -136,6 +150,7 @@ void GameState::initTileMap()
 GameState::GameState(StateData* state_data)
 	: State(state_data)
 {
+	this->initVariables();
 	this->initDeferredRender();
 	this->initView();
 	this->initSound();
@@ -206,11 +221,23 @@ void GameState::updatePlayerInput(const float& dt)
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_RIGHT"))))
 		this->player->move(1.f, dt);
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("JUMP"))) && this->getKeytime())
-		this->player->jump();
+		if (this->player->getCanJump())
+		{
+			this->player->jump();
+			if (this->player->getJumpCount() == 1)
+				jump1effect.play();
+			else if (this->player->getJumpCount() == 2)
+				jump2effect.play();
+		}
+		
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("SHOOT"))) && this->getKeytime() && this->bullets.size() < 5)
 	{
 		this->shooteffect.play();
 		this->bullets.push_back(new Bullet(this->player->getPosition().x + 36.f, this->player->getPosition().y + 14.f, this->textures["BULLET"]));
+	}
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("CHECKPOINT"))) && this->getKeytime())
+	{
+		this->player->setPosition(checkpointPlayer.x, checkpointPlayer.y);
 	}
 }
 
@@ -251,6 +278,8 @@ void GameState::updateTileMap(const float& dt)
 {
 	this->tileMap->update();
 	this->tileMap->updateCollision(this->player, dt);
+	if(this->tileMap->getDamageCollision(this->player, dt))
+		this->player->setPosition(checkpointPlayer.x, checkpointPlayer.y);
 }
 
 void GameState::update(const float& dt)

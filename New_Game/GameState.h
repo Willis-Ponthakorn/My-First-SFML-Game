@@ -17,8 +17,14 @@ class GameState :
 {
 private:
     sf::Music music;
-    sf::SoundBuffer soundeffect;
+
+    sf::SoundBuffer soundshoot;
+    sf::SoundBuffer soundjump1;
+    sf::SoundBuffer soundjump2;
+
     sf::Sound shooteffect;
+    sf::Sound jump1effect;
+    sf::Sound jump2effect;
 
     sf::View view;
     sf::RenderTexture renderTexture;
@@ -42,6 +48,8 @@ private:
     float mapPosYUp;
     float mapPosXRight;
     float mapPosYDown;
+
+    sf::Vector2f checkpointPlayer;
 
     void initVariables();
     void initDeferredRender();
