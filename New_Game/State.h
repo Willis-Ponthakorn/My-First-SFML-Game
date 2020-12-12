@@ -34,6 +34,7 @@ protected:
 	std::map<std::string, int> keybinds;
 	bool quit;
 	bool paused;
+	bool inMainMenuState;
 	float keytime;
 	float keytimeMax;
 	float gridSize;
@@ -51,9 +52,12 @@ public:
 	State(StateData* state_data);
 	virtual ~State();
 
+	const bool& getInMainMenuState() const;
 	const bool& getQuit() const;
 	const bool getKeytime();
 
+	void nowInMainMenuState();
+	void nowOutMainMenuState();
 	void endState();
 	void pauseState();
 	void unpauseState();

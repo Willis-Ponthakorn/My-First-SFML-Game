@@ -3,7 +3,6 @@
 
 #include "GameState.h"
 #include "EditorState.h"
-#include "SettingState.h"
 #include "Gui.h"
 
 class MainMenuState :
@@ -16,7 +15,12 @@ private:
 
     std::map<std::string, gui::Button*> buttons;
 
+    sf::Music music;
+
+    bool inMainMenuState;
+
     void initVariables();
+    void initSound();
     void initBackground();
     void initFonts();
     void initKeybinds();
@@ -25,6 +29,8 @@ private:
 public:
     MainMenuState(StateData* state_data);
     virtual ~MainMenuState();
+
+    const bool getInMainMenuState() const;
 
     void updateInput(const float& dt);
     void updateButtons();

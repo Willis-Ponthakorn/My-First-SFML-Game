@@ -16,6 +16,10 @@ class GameState :
     public State
 {
 private:
+    sf::Music music;
+    sf::SoundBuffer soundeffect;
+    sf::Sound shooteffect;
+
     sf::View view;
     sf::RenderTexture renderTexture;
     sf::Sprite renderSprite;
@@ -42,6 +46,7 @@ private:
     void initVariables();
     void initDeferredRender();
     void initView();
+    void initSound();
     void initBackground();
     void initKeybinds();
     void initFonts();

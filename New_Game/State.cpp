@@ -12,11 +12,17 @@ State::State(StateData* state_data)
 	this->keytime = 0.f;
 	this->keytimeMax = 20.f;
 	this->gridSize = state_data->gridSize;
+	this->inMainMenuState = true;
 }
 
 State::~State()
 {
 
+}
+
+const bool& State::getInMainMenuState() const
+{
+	return this->inMainMenuState;
 }
 
 const bool& State::getQuit() const
@@ -33,6 +39,16 @@ const bool State::getKeytime()
 	}
 
 	return false;
+}
+
+void State::nowInMainMenuState()
+{
+	this->inMainMenuState = true;
+}
+
+void State::nowOutMainMenuState()
+{
+	this->inMainMenuState = false;
 }
 
 void State::endState()

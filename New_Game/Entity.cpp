@@ -84,6 +84,8 @@ bool Entity::getIntersects(const sf::FloatRect& frect) const
 {
 	if (this->hitboxComponent)
 		return this->hitboxComponent->intersects(frect);
+
+	return this->sprite.getGlobalBounds().intersects(frect);
 }
 
 void Entity::setPosition(const float x, const float y)

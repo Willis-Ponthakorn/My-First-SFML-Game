@@ -3,7 +3,16 @@
 
 void MainMenuState::initVariables()
 {
+	this->inMainMenuState = true;
+}
 
+void MainMenuState::initSound()
+{
+	this->music.openFromFile("res/sound/MainMenu.wav");
+	this->music.setVolume(25);
+
+	this->music.setLoop(true);
+	this->music.play();
 }
 
 void MainMenuState::initBackground()
@@ -57,8 +66,8 @@ void MainMenuState::initButtons()
 		&this->font, "New Game", 20,
 		sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 255), sf::Color(20, 20, 20, 200));
 
-	this->buttons["SETTING_STATE"] = new gui::Button(465.f, 370.f, 150.f, 50.f,
-		&this->font, "Setting", 20,
+	this->buttons["SCOREBOARD_STATE"] = new gui::Button(465.f, 370.f, 150.f, 50.f,
+		&this->font, "Scoreboard", 20,
 		sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 255), sf::Color(20, 20, 20, 200));
 
 	this->buttons["EDITOR_STATE"] = new gui::Button(465.f, 470.f, 150.f, 50.f,
@@ -74,6 +83,7 @@ MainMenuState::MainMenuState(StateData* state_data)
 	: State(state_data)
 {
 	this->initVariables();
+	this->initSound();
 	this->initBackground();
 	this->initFonts();
 	this->initKeybinds();
@@ -87,6 +97,11 @@ MainMenuState::~MainMenuState()
 	{
 		delete it->second;
 	}
+}
+
+const bool MainMenuState::getInMainMenuState() const
+{
+	return this->inMainMenuState;
 }
 
 void MainMenuState::updateInput(const float& dt)
@@ -103,12 +118,14 @@ void MainMenuState::updateButtons()
 	
 	if (this->buttons["GAME_STATE"]->isPressed())
 	{
+		this->music.stop();
+		this->nowOutMainMenuState();
 		this->states->push(new GameState(this->stateData));
 	}
 
-	if (this->buttons["SETTING_STATE"]->isPressed())
+	if (this->buttons["SCOREBOARD_STATE"]->isPressed())
 	{
-		this->states->push(new SettingState(this->stateData));
+		//this->states->push(new SettingState(this->stateData));
 	}
 
 	if (this->buttons["EDITOR_STATE"]->isPressed())
@@ -124,6 +141,9 @@ void MainMenuState::updateButtons()
 
 void MainMenuState::update(const float& dt)
 {
+	if(this->music.getStatus() == 0 && this->getInMainMenuState())
+		this->music.play();
+
 	this->updateMousePosition();
 	this->updateInput(dt);
 

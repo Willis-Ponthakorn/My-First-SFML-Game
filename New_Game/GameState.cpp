@@ -43,6 +43,21 @@ void GameState::initView()
 	);
 }
 
+void GameState::initSound()
+{
+	this->music.openFromFile("res/sound/GameNormal.wav");
+	this->music.setVolume(25);
+
+	this->music.play();
+	this->music.setLoop(true);
+
+	if(!this->soundeffect.loadFromFile("res/sound/Pew.wav"))
+		throw "ERROR::GAMESTATE::FAILED_TO_LOAD_SOUND_EFFECT";
+
+	this->shooteffect.setBuffer(this->soundeffect);
+	this->shooteffect.setVolume(50);
+}
+
 void GameState::initBackground()
 {
 	this->background.setSize(
@@ -55,7 +70,7 @@ void GameState::initBackground()
 
 	if (!this->bgTexture.loadFromFile("res/image/background.png"))
 	{
-		throw "ERROR::MAINMENUSTATE::FAILED_TO_LOAD_BACKGROUND_TEXTURE";
+		throw "ERROR::GAMESTATE::FAILED_TO_LOAD_BACKGROUND_TEXTURE";
 	}
 
 	this->background.setTexture(&this->bgTexture);
@@ -123,6 +138,7 @@ GameState::GameState(StateData* state_data)
 {
 	this->initDeferredRender();
 	this->initView();
+	this->initSound();
 	this->initBackground();
 	this->initKeybinds();
 	this->initFonts();
@@ -192,14 +208,19 @@ void GameState::updatePlayerInput(const float& dt)
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("JUMP"))) && this->getKeytime())
 		this->player->jump();
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("SHOOT"))) && this->getKeytime() && this->bullets.size() < 5)
+	{
+		this->shooteffect.play();
 		this->bullets.push_back(new Bullet(this->player->getPosition().x + 36.f, this->player->getPosition().y + 14.f, this->textures["BULLET"]));
-	
+	}
 }
 
 void GameState::updatePauseMenuButtons()
 {
 	if (this->pmenu->isButtonPressed("QUIT") && this->getKeytime())
+	{
+		this->nowInMainMenuState();
 		this->endState();
+	}
 }
 
 void GameState::updateBackgroundPosition(float pos_x, float pos_y)
