@@ -78,6 +78,11 @@ const bool MovementComponent::getState(const short unsigned state) const
 	return false;
 }
 
+void MovementComponent::checkpointJumpCount()
+{
+	this->jumpCount = 1;
+}
+
 void MovementComponent::resetJumpCount()
 {
 	this->jumpCount = 0;
@@ -103,14 +108,15 @@ void MovementComponent::jump()
 {
 	if (getCanJump())
 	{
-		this->velocity.y = -sqrtf(2.0f * 490.5f * jumpHeight);
+		this->velocity.y = -sqrtf(2.0f * 981.f * jumpHeight);
 		this->jumpCount++;
 	}
 }
 
-void MovementComponent::move(const float dir_x, const float& dt)
+void MovementComponent::move(const float dir_x, const float dir_y, const float& dt)
 {
 	this->velocity.x += this->acceleration * dir_x;
+	this->velocity.y += this->acceleration * dir_y;
 }
 
 void MovementComponent::update(const float& dt)
@@ -139,10 +145,10 @@ void MovementComponent::update(const float& dt)
 			this->velocity.x = 0.f;
 	}
 
-	if (jumping && this->velocity.y <= 490.5f)
-		this->velocity.y += 490.5f * dt;
-	else if (jumping && this-> velocity.y > 490.5f)
-		this->velocity.y = 490.5f;
+	if (jumping && this->velocity.y <= 981.f)
+		this->velocity.y += 981.f * dt;
+	else if (jumping && this-> velocity.y > 981.f)
+		this->velocity.y = 981.f;
 
 	this->sprite.move(this->velocity * dt);
 }

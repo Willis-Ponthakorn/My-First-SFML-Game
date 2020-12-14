@@ -90,6 +90,12 @@
     <ClCompile Include="Boss.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
+    <ClCompile Include="Monster.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="Item.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -144,6 +150,12 @@
       <Filter>Entity</Filter>
     </ClInclude>
     <ClInclude Include="Boss.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="Monster.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="Item.h">
       <Filter>Entity</Filter>
     </ClInclude>
   </ItemGroup>

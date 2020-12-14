@@ -3,6 +3,7 @@
 
 void GameState::initVariables()
 {
+	srand(time(NULL));
 	this->camPosX = 0.f;
 	this->camPosY = 0.f;
 	this->mapPosXLeft = 0.f;
@@ -11,6 +12,9 @@ void GameState::initVariables()
 	this->mapPosYDown = 0.f;
 	this->checkpointPlayer.x = 100.f;
 	this->checkpointPlayer.y = 600.f;
+	this->moveBossUp = true;
+	this->moveMonsterRight = true;
+	this->jumpRandom = 0;
 }
 
 void GameState::initDeferredRender()
@@ -62,14 +66,26 @@ void GameState::initSound()
 	if (!this->soundjump2.loadFromFile("res/sound/jump2.wav"))
 		throw "ERROR::GAMESTATE::FAILED_TO_LOAD_SOUND_JUMP2_EFFECT";
 
+	if (!this->soundcheckpoint.loadFromFile("res/sound/Checkpoint.wav"))
+		throw "ERROR::GAMESTATE::FAILED_TO_LOAD_SOUND_CHECKPOINT_EFFECT";
+
+	if (!this->sounddeath.loadFromFile("res/sound/Death.wav"))
+		throw "ERROR::GAMESTATE::FAILED_TO_LOAD_SOUND_DEATH_EFFECT";
+
 	this->shooteffect.setBuffer(this->soundshoot);
-	this->shooteffect.setVolume(50);
+	this->shooteffect.setVolume(25);
 
 	this->jump1effect.setBuffer(this->soundjump1);
 	this->jump1effect.setVolume(50);
 
 	this->jump2effect.setBuffer(this->soundjump2);
 	this->jump2effect.setVolume(50);
+
+	this->checkpointeffect.setBuffer(this->soundcheckpoint);
+	this->checkpointeffect.setVolume(50);
+
+	this->deatheffect.setBuffer(this->sounddeath);
+	this->deatheffect.setVolume(50);
 }
 
 void GameState::initBackground()
@@ -127,6 +143,18 @@ void GameState::initTexture()
 	{
 		throw "ERROR::GAMESTATE::COULD_NOT_LOAD_BULLET_TEXTURE";
 	}
+	if (!this->textures["MONSTER"].loadFromFile("res/image/monster.png"))
+	{
+		throw "ERROR::GAMESTATE::COULD_NOT_LOAD_MONSTER_TEXTURE";
+	}
+	if (!this->textures["BOSS"].loadFromFile("res/image/Boss.png"))
+	{
+		throw "ERROR::GAMESTATE::COULD_NOT_LOAD_BOSS_TEXTURE";
+	}
+	if (!this->textures["ITEM"].loadFromFile("res/image/JumpItem.png"))
+	{
+		throw "ERROR::GAMESTATE::COULD_NOT_LOAD_ITEM_TEXTURE";
+	}
 }
 
 void GameState::initPauseMenu()
@@ -139,6 +167,23 @@ void GameState::initPauseMenu()
 void GameState::initPlayer()
 {
 	this->player = new Player(100, 600, this->textures["PLAYER_SHEET"]);
+}
+
+void GameState::initMonster()
+{
+	//this->monsters.push_back(new Monster(150, 400, this->textures["MONSTER"], MonsterTypes::RANDOMJUMPWALKING));
+}
+
+void GameState::initItem()
+{
+	this->items.push_back(new Item(500, 200, this->textures["ITEM"]));
+	this->items.push_back(new Item(700, 200, this->textures["ITEM"]));
+	this->items.push_back(new Item(900, 200, this->textures["ITEM"]));
+}
+
+void GameState::initBoss()
+{
+	//this->boss = new Boss(300, 100, this->textures["BOSS"]);
 }
 
 void GameState::initTileMap()
@@ -161,6 +206,9 @@ GameState::GameState(StateData* state_data)
 	this->initPauseMenu();
 
 	this->initPlayer();
+	this->initMonster();
+	this->initItem();
+	this->initBoss();
 	this->initTileMap();
 }
 
@@ -217,9 +265,9 @@ void GameState::updateInput(const float& dt)
 void GameState::updatePlayerInput(const float& dt)
 {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_LEFT"))))
-		this->player->move(-1.f, dt);
+		this->player->move(-1.f, 0.f, dt);
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_RIGHT"))))
-		this->player->move(1.f, dt);
+		this->player->move(1.f, 0.f, dt);
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("JUMP"))) && this->getKeytime())
 		if (this->player->getCanJump())
 		{
@@ -237,8 +285,138 @@ void GameState::updatePlayerInput(const float& dt)
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("CHECKPOINT"))) && this->getKeytime())
 	{
+		this->player->checkpointJumpCount();
 		this->player->setPosition(checkpointPlayer.x, checkpointPlayer.y);
 	}
+}
+
+void GameState::updatePlayer(const float& dt)
+{
+	this->updatePlayerInput(dt);
+
+	this->player->update(dt);
+}
+
+void GameState::updateMonster(const float& dt)
+{
+	/*for (size_t i = 0; i < this->monsters.size(); i++)
+	{	
+		this->monsters[i]->update(dt);
+
+		if (this->monsters[i]->getType() == MonsterTypes::RANDOMJUMPIDLE)
+		{
+			this->jumpRandom = rand() % 100;
+			if(this->jumpRandom == 5)
+				this->monsters[i]->jump();
+		}
+		else if (this->monsters[i]->getType() == MonsterTypes::WALKING)
+		{
+			if (this->moveMonsterRight)
+			{
+				this->monsters[i]->move(1.f, 0.f, dt);
+				if (this->tileMap->getMonsterCollision(this->monsters[i], dt))
+					this->moveMonsterRight = false;
+			}
+			else
+			{
+				this->monsters[i]->move(-1.f, 0.f, dt);
+				if (this->tileMap->getMonsterCollision(this->monsters[i], dt))
+					this->moveMonsterRight = true;
+			}
+		}
+		else if (this->monsters[i]->getType() == MonsterTypes::RANDOMJUMPWALKING)
+		{
+			if (this->moveMonsterRight)
+			{
+				this->jumpRandom = rand() % 100;
+				if (this->jumpRandom == 5)
+					this->monsters[i]->jump();
+				this->monsters[i]->move(1.f, 0.f, dt);
+				if (this->tileMap->getMonsterCollision(this->monsters[i], dt))
+					this->moveMonsterRight = false;
+			}
+			else
+			{
+				this->jumpRandom = rand() % 100;
+				if (this->jumpRandom == 5)
+					this->monsters[i]->jump();
+				this->monsters[i]->move(-1.f, 0.f, dt);
+				if (this->tileMap->getMonsterCollision(this->monsters[i], dt))
+					this->moveMonsterRight = true;
+			}
+		}
+		if (this->monsters[i]->getIntersects(this->player->getGlobalBounds()))
+		{
+			this->deatheffect.play();
+			this->player->checkpointJumpCount();
+			this->player->setPosition(checkpointPlayer.x, checkpointPlayer.y);
+		}
+
+		for (size_t j = 0; j < this->bullets.size(); j++)
+		{
+			if (this->monsters[i]->getIntersects(this->bullets[j]->getGlobalBounds()))
+				this->bullets.erase(bullets.begin() + j);
+		}
+	}*/
+}
+
+void GameState::updateItem(const float& dt)
+{
+	for (size_t i = 0; i < this->items.size(); i++)
+	{
+		this->items[i]->update(dt);
+
+		if (this->items[i]->getIntersects(this->player->getGlobalBounds()))
+		{
+			this->player->checkpointJumpCount();
+			this->itemPos.push_back(sf::Vector2f(this->items[i]->getPosition().x, this->items[i]->getPosition().y));
+			this->itemTime.push_back(sf::Clock());
+			this->items.erase(items.begin() + i);
+		}
+		
+	}
+	for (size_t j = 0; j < this->itemPos.size(); j++)
+	{
+		sf::Time elapsed = this->itemTime[j].getElapsedTime();
+		if (elapsed.asSeconds() >= 3.f)
+		{
+			this->items.push_back(new Item(this->itemPos[j].x, this->itemPos[j].y, this->textures["ITEM"]));
+			this->itemPos.erase(itemPos.begin() + j);
+			this->itemTime.erase(itemTime.begin() + j);
+		}
+	}
+}
+
+void GameState::updateBoss(const float& dt)
+{
+	/*this->boss->update(dt);
+
+	if (this->moveBossUp)
+	{
+		this->boss->move(0.f, -1.f, dt);
+		if (this->boss->getPosition().y < this->mapPosYUp + 50.f)
+		{
+			this->boss->setPosition(this->boss->getPosition().x, this->mapPosYUp + 50.f);
+			this->boss->stopVelocityY();
+			this->moveBossUp = false;
+		}
+	}
+	else
+	{
+		this->boss->move(0.f, 1.f, dt);
+		if (this->boss->getPosition().y > this->mapPosYDown - 300.f)
+		{
+			this->boss->setPosition(this->boss->getPosition().x, this->mapPosYDown - 300.f);
+			this->boss->stopVelocityY();
+			this->moveBossUp = true;
+		}
+	}
+
+	for (size_t i = 0; i < this->bullets.size(); i++)
+	{
+		if (this->boss->getIntersects(this->bullets[i]->getGlobalBounds()))
+			this->bullets.erase(bullets.begin() + i);
+	}*/
 }
 
 void GameState::updatePauseMenuButtons()
@@ -259,7 +437,9 @@ void GameState::updateBullet(const float& dt)
 {
 	for (size_t i = 0; i < this->bullets.size(); i++)
 	{
-		this->bullets[i]->move(1.f, dt);
+		this->bullets[i]->update(dt);
+
+		this->bullets[i]->move(1.f, 0.f, dt);
 
 		if (this->bullets[i]->getPosition().x > this->mapPosXRight)
 			this->bullets.erase(bullets.begin() + i);
@@ -269,8 +449,15 @@ void GameState::updateBullet(const float& dt)
 			this->bullets.erase(bullets.begin() + i);
 		else if (this->bullets[i]->getPosition().y < this->mapPosYUp)
 			this->bullets.erase(bullets.begin() + i);
-		else if(this->tileMap->getBulletCollision(this->bullets[i], dt))
+		else if (this->tileMap->getBulletCollision(this->bullets[i], dt))
 			this->bullets.erase(bullets.begin() + i);
+		else if (this->tileMap->getCheckPoint(this->bullets[i], dt))
+		{
+			this->checkpointeffect.play();
+			this->checkpointPlayer.x = this->player->getPosition().x;
+			this->checkpointPlayer.y = this->player->getPosition().y;
+			this->bullets.erase(bullets.begin() + i);
+		}
 	}
 }
 
@@ -278,8 +465,16 @@ void GameState::updateTileMap(const float& dt)
 {
 	this->tileMap->update();
 	this->tileMap->updateCollision(this->player, dt);
-	if(this->tileMap->getDamageCollision(this->player, dt))
+	for (size_t i = 0; i < this->monsters.size(); i++)
+	{
+		this->tileMap->updateCollision(this->monsters[i], dt);
+	}
+	if (this->tileMap->getDamageCollision(this->player, dt))
+	{
+		this->deatheffect.play();
+		this->player->checkpointJumpCount();
 		this->player->setPosition(checkpointPlayer.x, checkpointPlayer.y);
+	}
 }
 
 void GameState::update(const float& dt)
@@ -294,20 +489,17 @@ void GameState::update(const float& dt)
 
 		this->updateView(dt);
 
-		this->updatePlayerInput(dt);
+		this->updatePlayer(dt);
+
+		this->updateItem(dt);
+
+		this->updateMonster(dt);
+
+		this->updateBoss(dt);
 
 		this->updateBullet(dt);
 		
-		this->player->update(dt);
-		
 		this->updateTileMap(dt);
-		
-			
-
-		for (size_t i = 0; i < this->bullets.size(); i++)
-		{
-			this->bullets[i]->update(dt);
-		}
 	}
 	else
 	{
@@ -330,6 +522,18 @@ void GameState::render(sf::RenderTarget* target)
 	this->tileMap->render(this->renderTexture, this->player->getGridPosition(static_cast<int>(this->stateData->gridSize)));
 
 	this->player->render(this->renderTexture);
+
+	for (size_t i = 0; i < this->items.size(); i++)
+	{
+		this->items[i]->render(this->renderTexture);
+	}
+
+	for (size_t i = 0; i < this->monsters.size(); i++)
+	{
+		this->monsters[i]->render(this->renderTexture);
+	}
+
+	//this->boss->render(this->renderTexture);
 
 	for (size_t i = 0; i < this->bullets.size(); i++)
 	{

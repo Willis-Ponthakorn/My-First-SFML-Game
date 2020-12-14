@@ -42,8 +42,9 @@ public:
 
 	virtual void setPosition(const float x, const float y);
 	
-	virtual void move(const float dir_x, const float& dt);
+	virtual void move(const float dir_x, const float dir_y, const float& dt);
 	virtual void jump();
+	virtual void checkpointJumpCount();
 	virtual void resetJumpCount();
 	virtual void stopVelocity();
 	virtual void stopVelocityX();

@@ -106,16 +106,22 @@ void Entity::setPosition(const float x, const float y)
 		this->sprite.setPosition(x, y);
 }
 
-void Entity::move(const float dir_x, const float& dt)
+void Entity::move(const float dir_x, const float dir_y, const float& dt)
 {
 	if (this->movementComponent)
-		this->movementComponent->move(dir_x, dt);
+		this->movementComponent->move(dir_x, dir_y, dt);
 }
 
 void Entity::jump()
 {
 	if (this->movementComponent)
 		this->movementComponent->jump();
+}
+
+void Entity::checkpointJumpCount()
+{
+	if (this->movementComponent)
+		this->movementComponent->checkpointJumpCount();
 }
 
 void Entity::resetJumpCount()
@@ -144,8 +150,7 @@ void Entity::stopVelocityY()
 
 void Entity::update(const float& dt)
 {
-	if (this->movementComponent)
-		this->movementComponent->resetJumpCount();
+
 }
 
 void Entity::render(sf::RenderTarget& target)

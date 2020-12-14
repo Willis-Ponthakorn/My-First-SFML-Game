@@ -10,14 +10,10 @@ class Player :
     public Entity
 {
 private:
-    bool attack;
-
     void initVariables();
     void initComponents();
 
 public:
-    std::vector<Bullet> bullets;
-
     Player(float x, float y, sf::Texture& texture_sheet);
     virtual ~Player();
 

@@ -3,6 +3,9 @@
 
 #include "Player.h"
 #include "Bullet.h"
+#include "Monster.h"
+#include "Item.h"
+#include "Boss.h"
 #include "GameSettings.h"
 
 class Player;

@@ -1,19 +1,18 @@
-#ifndef BOSS_H
-#define BOSS_H
+#ifndef ITEM_H
+#define ITEM_H
 
 #include "Entity.h"
 
-class Boss :
+class Item :
     public Entity
 {
 private:
-
     void initVariables();
     void initComponents();
 
 public:
-    Boss(float x, float y, sf::Texture& texture_sheet);
-    virtual ~Boss();
+    Item(float x, float y, sf::Texture& texture_sheet);
+    virtual ~Item();
 
     void updateAnimation(const float& dt);
     void update(const float& dt);
@@ -22,3 +21,4 @@ public:
 };
 
 #endif
+

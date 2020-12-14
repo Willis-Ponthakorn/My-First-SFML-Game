@@ -89,6 +89,74 @@ const int TileMap::getLayerSize(const int x, const int y, const int layer) const
 	return -1;
 }
 
+const bool TileMap::getMonsterCollision(Entity* entity, const float& dt)
+{
+	this->layer = 0;
+
+	this->fromX = entity->getGridPosition(this->gridSizeI).x - 1;
+	if (this->fromX < 0)
+		this->fromX = 0;
+	else if (this->fromX > this->maxSizeWorldGrid.x)
+		this->fromX = this->maxSizeWorldGrid.x;
+
+	this->toX = entity->getGridPosition(this->gridSizeI).x + 3;
+	if (this->toX < 0)
+		this->toX = 0;
+	else if (this->toX > this->maxSizeWorldGrid.x)
+		this->toX = this->maxSizeWorldGrid.x;
+
+	this->fromY = entity->getGridPosition(this->gridSizeI).y - 1;
+	if (this->fromY < 0)
+		this->fromY = 0;
+	else if (this->fromY > this->maxSizeWorldGrid.y)
+		this->fromY = this->maxSizeWorldGrid.y;
+
+	this->toY = entity->getGridPosition(this->gridSizeI).y + 3;
+	if (this->toY < 0)
+		this->toY = 0;
+	else if (this->toY > this->maxSizeWorldGrid.y)
+		this->toY = this->maxSizeWorldGrid.y;
+
+	for (int x = this->fromX; x < this->toX; x++)
+	{
+		for (int y = this->fromY; y < this->toY; y++)
+		{
+			for (int k = 0; k < this->map[x][y][this->layer].size(); k++)
+			{
+				sf::FloatRect bulletsBounds = entity->getGlobalBounds();
+				sf::FloatRect wallBounds = this->map[x][y][this->layer][k]->getGlobalBounds();
+				sf::FloatRect nextPositionBounds = entity->getNextPositionBounds(dt);
+				if (this->map[x][y][this->layer][k]->getCollision() &&
+					this->map[x][y][this->layer][k]->intersects(nextPositionBounds) &&
+					this->map[x][y][this->layer][k]->getType() == TileTypes::COLLISION)
+				{
+					//Right collision
+					if (bulletsBounds.left < wallBounds.left
+						&& bulletsBounds.left + bulletsBounds.width < wallBounds.left + wallBounds.width
+						&& bulletsBounds.top < wallBounds.top + wallBounds.height
+						&& bulletsBounds.top + bulletsBounds.height > wallBounds.top
+						)
+					{
+						return true;
+					}
+
+					//Left collision
+					else if (bulletsBounds.left > wallBounds.left
+						&& bulletsBounds.left + bulletsBounds.width > wallBounds.left + wallBounds.width
+						&& bulletsBounds.top < wallBounds.top + wallBounds.height
+						&& bulletsBounds.top + bulletsBounds.height > wallBounds.top
+						)
+					{
+						return true;
+					}
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
 const bool TileMap::getBulletCollision(Entity* entity, const float& dt)
 {
 	if (entity->getPosition().x < 0.f)
@@ -208,6 +276,94 @@ const bool TileMap::getBulletCollision(Entity* entity, const float& dt)
 	return false;
 }
 
+const bool TileMap::getCheckPoint(Entity* entity, const float& dt)
+{
+	this->layer = 0;
+
+	this->fromX = entity->getGridPosition(this->gridSizeI).x - 1;
+	if (this->fromX < 0)
+		this->fromX = 0;
+	else if (this->fromX > this->maxSizeWorldGrid.x)
+		this->fromX = this->maxSizeWorldGrid.x;
+
+	this->toX = entity->getGridPosition(this->gridSizeI).x + 3;
+	if (this->toX < 0)
+		this->toX = 0;
+	else if (this->toX > this->maxSizeWorldGrid.x)
+		this->toX = this->maxSizeWorldGrid.x;
+
+	this->fromY = entity->getGridPosition(this->gridSizeI).y - 1;
+	if (this->fromY < 0)
+		this->fromY = 0;
+	else if (this->fromY > this->maxSizeWorldGrid.y)
+		this->fromY = this->maxSizeWorldGrid.y;
+
+	this->toY = entity->getGridPosition(this->gridSizeI).y + 3;
+	if (this->toY < 0)
+		this->toY = 0;
+	else if (this->toY > this->maxSizeWorldGrid.y)
+		this->toY = this->maxSizeWorldGrid.y;
+
+	for (int x = this->fromX; x < this->toX; x++)
+	{
+		for (int y = this->fromY; y < this->toY; y++)
+		{
+			for (int k = 0; k < this->map[x][y][this->layer].size(); k++)
+			{
+				sf::FloatRect bulletsBounds = entity->getGlobalBounds();
+				sf::FloatRect wallBounds = this->map[x][y][this->layer][k]->getGlobalBounds();
+				sf::FloatRect nextPositionBounds = entity->getNextPositionBounds(dt);
+				if (this->map[x][y][this->layer][k]->getCollision() &&
+					this->map[x][y][this->layer][k]->intersects(nextPositionBounds) &&
+					this->map[x][y][this->layer][k]->getType() == TileTypes::CHECKPOINT)
+				{
+					//Bottom collision
+					if (bulletsBounds.top < wallBounds.top
+						&& bulletsBounds.top + bulletsBounds.height < wallBounds.top + wallBounds.height
+						&& bulletsBounds.left < wallBounds.left + wallBounds.width
+						&& bulletsBounds.left + bulletsBounds.width > wallBounds.left
+						)
+					{
+						return true;
+					}
+
+					//Top collision
+					else if (bulletsBounds.top > wallBounds.top
+						&& bulletsBounds.top + bulletsBounds.height > wallBounds.top + wallBounds.height
+						&& bulletsBounds.left < wallBounds.left + wallBounds.width
+						&& bulletsBounds.left + bulletsBounds.width > wallBounds.left
+						)
+					{
+						return true;
+					}
+
+					//Right collision
+					if (bulletsBounds.left < wallBounds.left
+						&& bulletsBounds.left + bulletsBounds.width < wallBounds.left + wallBounds.width
+						&& bulletsBounds.top < wallBounds.top + wallBounds.height
+						&& bulletsBounds.top + bulletsBounds.height > wallBounds.top
+						)
+					{
+						return true;
+					}
+
+					//Left collision
+					else if (bulletsBounds.left > wallBounds.left
+						&& bulletsBounds.left + bulletsBounds.width > wallBounds.left + wallBounds.width
+						&& bulletsBounds.top < wallBounds.top + wallBounds.height
+						&& bulletsBounds.top + bulletsBounds.height > wallBounds.top
+						)
+					{
+						return true;
+					}
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
 const bool TileMap::getDamageCollision(Entity* entity, const float& dt)
 {
 	this->layer = 0;
@@ -306,16 +462,7 @@ const bool TileMap::getDamageCollision(Entity* entity, const float& dt)
 					this->map[x][y][this->layer][k]->intersects(nextPositionBounds) &&
 					this->map[x][y][this->layer][k]->getType() == TileTypes::DAMAGEHALFTOPLEFT)
 				{
-					if (playerBounds.left < wallBounds.left
-						&& playerBounds.left + playerBounds.width < wallBounds.left + wallBounds.width / 2.f
-						&& playerBounds.top < wallBounds.top + wallBounds.height
-						&& playerBounds.top + playerBounds.height > wallBounds.top
-						)
-					{
-						return true;
-					}
-					else if (playerBounds.left > wallBounds.left
-						&& playerBounds.left + playerBounds.width > wallBounds.left + wallBounds.width
+					if (playerBounds.left + playerBounds.width > wallBounds.left + wallBounds.width / 2.f
 						&& playerBounds.top < wallBounds.top + wallBounds.height
 						&& playerBounds.top + playerBounds.height > wallBounds.top
 						)
@@ -559,7 +706,7 @@ void TileMap::updateCollision(Entity* entity, const float& dt)
 						&& playerBounds.left + playerBounds.width > wallBounds.left
 						)
 					{
-						std::cout << "On Top!!" << "\n";
+						//std::cout << "On Top!!" << "\n";
 						entity->resetJumpCount();
 						entity->stopVelocityY();
 						entity->setPosition(playerBounds.left, wallBounds.top - playerBounds.height);
@@ -572,7 +719,7 @@ void TileMap::updateCollision(Entity* entity, const float& dt)
 						&& playerBounds.left + playerBounds.width > wallBounds.left
 						)
 					{
-						std::cout << "Under Bottom!!" << "\n";
+						//std::cout << "Under Bottom!!" << "\n";
 						entity->stopVelocityY();
 						entity->setPosition(playerBounds.left, wallBounds.top + wallBounds.height);
 					}
@@ -584,7 +731,7 @@ void TileMap::updateCollision(Entity* entity, const float& dt)
 						&& playerBounds.top + playerBounds.height > wallBounds.top
 						)
 					{
-						std::cout << "On Left!!" << "\n";
+						//std::cout << "On Left!!" << "\n";
 						entity->stopVelocityX();
 						entity->setPosition(wallBounds.left - playerBounds.width - 1.f, playerBounds.top);
 					}
@@ -596,7 +743,7 @@ void TileMap::updateCollision(Entity* entity, const float& dt)
 						&& playerBounds.top + playerBounds.height > wallBounds.top
 						)
 					{
-						std::cout << "On Right!!" << "\n";
+						//std::cout << "On Right!!" << "\n";
 						entity->stopVelocityX();
 						entity->setPosition(wallBounds.left + wallBounds.width + 1.f, playerBounds.top);
 					}
@@ -611,7 +758,7 @@ void TileMap::updateCollision(Entity* entity, const float& dt)
 						&& playerBounds.left + playerBounds.width > wallBounds.left
 						)
 					{
-						std::cout << "On Top!!" << "\n";
+						//std::cout << "On Top!!" << "\n";
 						entity->resetJumpCount();
 						entity->stopVelocityY();
 						entity->setPosition(playerBounds.left, wallBounds.top - playerBounds.height);

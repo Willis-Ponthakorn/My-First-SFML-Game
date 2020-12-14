@@ -30,13 +30,14 @@ public:
 	const int& getJumpCount() const;
 
 	const bool getState(const short unsigned state) const;
+	void checkpointJumpCount();
 	void resetJumpCount();
 	void stopVelocity();
 	void stopVelocityX();
 	void stopVelocityY();
 
 	void jump();
-	void move(const float dir_x, const float& dt);
+	void move(const float dir_x, const float dir_y, const float& dt);
 	void update(const float& dt);
 };
 
