@@ -97,7 +97,7 @@
       <Filter>Entity</Filter>
     </ClCompile>
     <ClCompile Include="BossBullet.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -162,7 +162,7 @@
       <Filter>Entity</Filter>
     </ClInclude>
     <ClInclude Include="BossBullet.h">
-      <Filter>Header Files</Filter>
+      <Filter>Entity</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

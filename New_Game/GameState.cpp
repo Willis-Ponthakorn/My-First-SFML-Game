@@ -19,6 +19,11 @@ void GameState::initVariables()
 	this->getInBossStage = false;
 	this->bossMaxHP = 100.f;
 	this->getWin = false;
+	this->bossAttack = false;
+	this->bulletPosPattern2 = 1510.f;
+	this->fullBullet = false;
+	this->pattern = 0;
+	this->bulletPattern1 = 0;
 }
 
 void GameState::initDeferredRender()
@@ -194,7 +199,7 @@ void GameState::initText()
 
 void GameState::initTexture()
 {
-	if (!this->textures["PLAYER_SHEET"].loadFromFile("res/image/mainCharacterResize2.png"))
+	if (!this->textures["PLAYER_SHEET"].loadFromFile("res/image/mainCharacter.png"))
 	{
 		throw "ERROR::GAMESTATE::COULD_NOT_LOAD_PLAYER_TEXTURE";
 	}
@@ -214,6 +219,10 @@ void GameState::initTexture()
 	{
 		throw "ERROR::GAMESTATE::COULD_NOT_LOAD_ITEM_TEXTURE";
 	}
+	if (!this->textures["BOSS_BULLET"].loadFromFile("res/image/Boss_Bullet.png"))
+	{
+		throw "ERROR::GAMESTATE::COULD_NOT_LOAD_BOSS_BULLET_TEXTURE";
+	}
 }
 
 void GameState::initPauseMenu()
@@ -226,7 +235,7 @@ void GameState::initPauseMenu()
 void GameState::initPlayer()
 {
 	//this->player = new Player(100, 600, this->textures["PLAYER_SHEET"]);
-	this->player = new Player(10460, 1260, this->textures["PLAYER_SHEET"]);
+	this->player = new Player(10060, 1260, this->textures["PLAYER_SHEET"]);
 }
 
 void GameState::initMonster()
@@ -272,7 +281,7 @@ void GameState::initBoss()
 
 void GameState::initTileMap()
 {
-	this->tileMap = new TileMap(this->stateData->gridSize, 350, 225, "res/image/Tileset3.png");
+	this->tileMap = new TileMap(this->stateData->gridSize, 350, 225, "res/image/Tileset.png");
 	this->tileMap->loadFromFile("text.eosmp");
 }
 
@@ -381,10 +390,6 @@ void GameState::updatePlayerInput(const float& dt)
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("GOTOSAVE"))) && this->getKeytime3())
 	{
-		if (this->getInBossStage)
-			this->getInBossStage = false;
-		else
-			this->getInBossStage = true;
 		this->player->setPosition(100.f, 600.f);
 	}
 }
@@ -555,6 +560,87 @@ void GameState::updateBoss(const float& dt)
 			this->bossdieeffect.play();
 			this->getWin = true;
 		}
+		if (!this->bossAttack)
+		{
+			this->pattern = rand() % 3 + 1;
+			this->bossAttack = true;
+			for (size_t j = 0; j < this->playerPos.size(); j++)
+			{
+				this->playerPos.pop_back();
+			}
+		}
+	}
+}
+
+void GameState::updateBossAttackPattern1(const float& dt)
+{
+	std::cout << "PATTERN1" << "\n";
+	sf::Time bossDelayElapsed = bossDelay.getElapsedTime();
+	if (bossDelayElapsed.asSeconds() >= 0.5f && this->bossBullets.size() < 8 && !this->fullBullet && this->bulletPattern1 < 8)
+	{
+		this->bossBullets.push_back(new BossBullet(770.f, static_cast<float>(rand() % 720) + this->mapPosYUp, this->textures["BOSS_BULLET"], static_cast<float>(rand() % 4) + 1));
+		this->bulletPattern1++;
+		this->bossDelay.restart();
+	}
+	else if (this->bossBullets.size() >= 8)
+		this->fullBullet = true;
+
+	if (this->bulletPattern1 >= 8 && this->bossBullets.size() == 0)
+	{
+		this->bulletPattern1 = 0;
+		this->bossAttack = false;
+		this->fullBullet = false;
+		this->pattern = 0;
+	}
+}
+
+void GameState::updateBossAttackPattern2(const float& dt)
+{
+	std::cout << "PATTERN2" << "\n";
+	this->bulletPosYPattern3 = static_cast<float>(rand() % 720) + this->mapPosYUp;
+	if (this->bossBullets.size() < 3 && !this->fullBullet)
+	{
+		this->bossBullets.push_back(new BossBullet(770.f, this->bulletPosYPattern3, this->textures["BOSS_BULLET"], 4));
+		this->bossBullets.push_back(new BossBullet(770.f, this->bulletPosYPattern3 + 38.f, this->textures["BOSS_BULLET"], 4));
+		this->bossBullets.push_back(new BossBullet(770.f, this->bulletPosYPattern3 + 76.f, this->textures["BOSS_BULLET"], 4));
+		this->bulletPattern1 += 3;
+	}
+	else if (this->bossBullets.size() >= 3)
+		this->fullBullet = true;
+
+	if (this->bulletPattern1 >= 3 && this->bossBullets.size() == 0)
+	{
+		this->bulletPattern1 = 0;
+		this->bossAttack = false;
+		this->fullBullet = false;
+		this->pattern = 0;
+	}
+}
+
+void GameState::updateBossAttackPattern3(const float& dt)
+{
+	std::cout << "PATTERN3" << "\n";
+	sf::Time bossDelayElapsed = bossDelay.getElapsedTime();
+	if (bossDelayElapsed.asSeconds() >= 1.f && this->bossBullets.size() < 4 && !this->fullBullet && this->bulletPattern1 < 4)
+	{
+		this->bossBullets.push_back(new BossBullet(770.f, this->bulletPosPattern2, this->textures["BOSS_BULLET"], 2));
+		this->playerPos.push_back(sf::Vector2f(this->player->getPosition()));
+		this->bossDelay.restart();
+		this->bulletPosPattern2 += 147.5f;
+		this->bulletPattern1++;
+	}
+	else if (this->bulletPosPattern2 >= 2100.f)
+	{
+		this->bulletPosPattern2 = 1510.f;
+		this->fullBullet = true;
+	}
+
+	if (this->bulletPattern1 >= 4 && this->bossBullets.size() == 0)
+	{
+		this->bulletPattern1 = 0;
+		this->bossAttack = false;
+		this->fullBullet = false;
+		this->pattern = 0;
 	}
 }
 
@@ -575,7 +661,7 @@ void GameState::updatePauseMenuButtons()
 
 void GameState::updateMusic()
 {
-	if (!this->getInBossStage && this->music.getStatus() == 0)
+	if (!this->getInBossStage && this->music.getStatus() == 0 && !this->getWin)
 	{
 		this->music.play();
 		this->bossMusic.stop();
@@ -585,7 +671,7 @@ void GameState::updateMusic()
 		this->music.stop();
 		this->bossMusic.play();
 	}
-	else if (this->getWin)
+	else if (this->getInBossStage && this->getWin && this->endMusic.getStatus() == 0)
 	{
 		this->music.stop();
 		this->bossMusic.stop();
@@ -627,6 +713,66 @@ void GameState::updateBullet(const float& dt)
 	}
 }
 
+void GameState::updateBossBullet(const float& dt)
+{
+	for (size_t i = 0; i < this->bossBullets.size(); i++)
+	{
+		this->bossBullets[i]->update(dt);
+
+		if (this->pattern == 1)
+		{
+			for (size_t i = 0; i < this->bossBullets.size(); i++)
+			{
+				this->bossBullets[i]->move(-1.f, 0.f, dt);
+			}
+		}
+		else if (this->pattern == 2)
+		{
+			for (size_t i = 0; i < this->bossBullets.size(); i++)
+			{
+				this->bossBullets[i]->move(-1.f, 0.f, dt);
+			}
+		}
+		else if (this->pattern == 3)
+		{
+			for (size_t i = 0; i < this->bossBullets.size(); i++)
+			{
+				if (this->bossBullets[i]->getPosition().y < this->playerPos[i].y)
+				{
+					this->bossBullets[i]->move(
+						-1.f * (this->bossBullets[i]->getPosition().x - this->playerPos[i].x) * (this->bossBullets[i]->getPosition().x - this->playerPos[i].x) / 1000000.f,
+						(this->bossBullets[i]->getPosition().y - this->playerPos[i].y) * (this->bossBullets[i]->getPosition().y - this->playerPos[i].y) / 1000000.f,
+						dt);
+				}
+				else if (this->bossBullets[i]->getPosition().y >= this->playerPos[i].y)
+				{
+					this->bossBullets[i]->move(
+						-1.f * (this->bossBullets[i]->getPosition().x - this->playerPos[i].x)* (this->bossBullets[i]->getPosition().x - this->playerPos[i].x) / 1000000.f,
+						-1.f * (this->bossBullets[i]->getPosition().y - this->playerPos[i].y)* (this->bossBullets[i]->getPosition().y - this->playerPos[i].y) / 1000000.f,
+						dt);
+				}
+			}
+		}
+		if (this->bossBullets[i]->getIntersects(this->player->getGlobalBounds()))
+		{
+			this->deatheffect.play();
+			this->player->checkpointJumpCount();
+			this->player->stopVelocity();
+			this->player->setPosition(checkpointPlayer.x, checkpointPlayer.y);
+			this->getInBossStage = false;
+		}
+
+		if (this->bossBullets[i]->getPosition().x > this->mapPosXRight)
+			this->bossBullets.erase(bossBullets.begin() + i);
+		else if (this->bossBullets[i]->getPosition().x < this->mapPosXLeft)
+			this->bossBullets.erase(bossBullets.begin() + i);
+		else if (this->bossBullets[i]->getPosition().y > this->mapPosYDown)
+			this->bossBullets.erase(bossBullets.begin() + i);
+		else if (this->bossBullets[i]->getPosition().y < this->mapPosYUp)
+			this->bossBullets.erase(bossBullets.begin() + i);
+	}
+}
+
 void GameState::updateTileMap(const float& dt)
 {
 	this->tileMap->update();
@@ -658,6 +804,22 @@ void GameState::updateBossStage(const float& dt)
 	{
 		if (this->boss->getPosition().x > 800.f)
 			this->boss->move(-1.f, 0.f, dt);
+
+		if (this->bossAttack)
+		{
+			if (this->pattern == 1)
+			{
+				this->updateBossAttackPattern1(dt);
+			}
+			else if (this->pattern == 2)
+			{
+				this->updateBossAttackPattern2(dt);
+			}
+			else if (this->pattern == 3)
+			{
+				this->updateBossAttackPattern3(dt);
+			}
+		}
 	}
 }
 
@@ -690,6 +852,8 @@ void GameState::update(const float& dt)
 			this->updateBoss(dt);
 
 			this->updateBossStage(dt);
+
+			this->updateBossBullet(dt);
 		}
 
 		this->updateBullet(dt);
@@ -737,6 +901,11 @@ void GameState::render(sf::RenderTarget* target)
 	for (size_t i = 0; i < this->bullets.size(); i++)
 	{
 		this->bullets[i]->render(this->renderTexture);
+	}
+
+	for (size_t i = 0; i < this->bossBullets.size(); i++)
+	{
+		this->bossBullets[i]->render(this->renderTexture);
 	}
 	
 

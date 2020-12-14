@@ -6,9 +6,15 @@
 #include "Monster.h"
 #include "Item.h"
 #include "Boss.h"
+#include "BossBullet.h"
 #include "GameSettings.h"
 
 class Player;
+class Bullet;
+class Monster;
+class Item;
+class Boss;
+class BossBullet;
 class GameSettings;
 class State;
 

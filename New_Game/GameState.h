@@ -6,10 +6,6 @@
 #include "TileMap.h"
 
 class PauseMenu;
-class Player;
-class Bullet;
-class Item;
-class Boss;
 class TileMap;
 class sf::View;
 class sf::Font;
@@ -50,6 +46,7 @@ private:
     sf::Text text;
     sf::Clock clock;
     sf::Clock bossTiming;
+    sf::Clock bossDelay;
     sf::Time gameTime;
 
     sf::Texture bgTexture;
@@ -64,12 +61,14 @@ private:
     std::vector<Bullet*> bullets;
     std::vector<Monster*> monsters;
     std::vector<Item*> items;
+    std::vector<BossBullet*> bossBullets;
     Boss* boss;
 
     sf::Texture texture;
 
     TileMap* tileMap;
-
+    
+    bool bossAttack;
     bool moveBossUp;
     bool getInBossStage;
     bool getWin;
@@ -83,10 +82,16 @@ private:
     int jumpRandom;
     int sec;
     int checkSec;
+    int pattern;
     float textPos;
     float bossMaxHP;
+    float bulletPosPattern2;
+    float bulletPosYPattern3;
+    int bulletPattern1;
+    bool fullBullet;
     std::vector<sf::Vector2f> itemPos;
     std::vector<sf::Clock> itemTime;
+    std::vector<sf::Vector2f> playerPos;
 
     sf::Vector2f checkpointPlayer;
 
@@ -118,11 +123,15 @@ public:
     void updateMonster(const float& dt);
     void updateItem(const float& dt);
     void updateBoss(const float& dt);
+    void updateBossAttackPattern1(const float& dt);
+    void updateBossAttackPattern2(const float& dt);
+    void updateBossAttackPattern3(const float& dt);
     void updateBossHP();
     void updatePauseMenuButtons();
     void updateMusic();
     void updateBackgroundPosition(float pos_x, float pos_y);
     void updateBullet(const float& dt);
+    void updateBossBullet(const float& dt);
     void updateTileMap(const float& dt);
     void updateBossStage(const float& dt);
     void update(const float& dt);
