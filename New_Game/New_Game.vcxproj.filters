@@ -96,6 +96,9 @@
     <ClCompile Include="Item.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
+    <ClCompile Include="BossBullet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -157,6 +160,9 @@
     </ClInclude>
     <ClInclude Include="Item.h">
       <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="BossBullet.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

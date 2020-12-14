@@ -39,6 +39,9 @@ protected:
 	bool paused;
 	bool inMainMenuState;
 	float keytime;
+	float keytime1;
+	float keytime2;
+	float keytime3;
 	float keytimeMax;
 	float gridSize;
 
@@ -58,6 +61,9 @@ public:
 	const bool& getInMainMenuState() const;
 	const bool& getQuit() const;
 	const bool getKeytime();
+	const bool getKeytime1();
+	const bool getKeytime2();
+	const bool getKeytime3();
 
 	void nowInMainMenuState();
 	void nowOutMainMenuState();

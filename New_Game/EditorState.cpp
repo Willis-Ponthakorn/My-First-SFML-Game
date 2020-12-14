@@ -107,7 +107,7 @@ void EditorState::initGui()
 
 void EditorState::initTileMap()
 {
-	this->tileMap = new TileMap(this->stateData->gridSize, 330, 220, "res/image/Tileset3.png");
+	this->tileMap = new TileMap(this->stateData->gridSize, 350, 225, "res/image/Tileset3.png");
 }
 
 EditorState::EditorState(StateData* state_data)

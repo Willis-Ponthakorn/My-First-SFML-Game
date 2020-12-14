@@ -39,6 +39,7 @@ public:
 	const bool getBulletCollision(Entity* entity, const float& dt);
 	const bool getCheckPoint(Entity* entity, const float& dt);
 	const bool getDamageCollision(Entity* entity, const float& dt);
+	const bool getBossStageCollision(Entity* entity, const float& dt);
 
 	void addTile(const int x, const int y, const int z, const sf::IntRect& texture_rect, const bool& collision, const short& type);
 	void removeTile(const int x, const int y, const int z);

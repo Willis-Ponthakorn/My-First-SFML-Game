@@ -10,6 +10,9 @@ State::State(StateData* state_data)
 	this->quit = false;
 	this->paused = false;
 	this->keytime = 0.f;
+	this->keytime1 = 0.f;
+	this->keytime2 = 0.f;
+	this->keytime3 = 0.f;
 	this->keytimeMax = 20.f;
 	this->gridSize = state_data->gridSize;
 	this->inMainMenuState = true;
@@ -35,6 +38,39 @@ const bool State::getKeytime()
 	if (this->keytime >= this->keytimeMax)
 	{
 		this->keytime = 0.f;
+		return true;
+	}
+
+	return false;
+}
+
+const bool State::getKeytime1()
+{
+	if (this->keytime1 >= this->keytimeMax)
+	{
+		this->keytime1 = 0.f;
+		return true;
+	}
+
+	return false;
+}
+
+const bool State::getKeytime2()
+{
+	if (this->keytime2 >= this->keytimeMax)
+	{
+		this->keytime2 = 0.f;
+		return true;
+	}
+
+	return false;
+}
+
+const bool State::getKeytime3()
+{
+	if (this->keytime3 >= this->keytimeMax)
+	{
+		this->keytime3 = 0.f;
 		return true;
 	}
 
@@ -88,4 +124,10 @@ void State::updateKeytime(const float& dt)
 {
 	if (this->keytime < this->keytimeMax)
 		this->keytime += 100.f * dt;
+	if (this->keytime1 < this->keytimeMax)
+		this->keytime1 += 100.f * dt;
+	if (this->keytime2 < this->keytimeMax)
+		this->keytime2 += 150.f * dt;
+	if (this->keytime3 < this->keytimeMax)
+		this->keytime3 += 200.f * dt;
 }

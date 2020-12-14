@@ -16,7 +16,7 @@ Boss::Boss(float x, float y, sf::Texture& texture_sheet)
 	this->setPosition(x, y);
 
 	this->createHitboxComponent(this->sprite, 26.25f, 28.f, 87.5f, 294.f);
-	this->createMovementComponent(3.f, 2.f, 1.f, 0.f, 0, false);
+	this->createMovementComponent(50.f, 2.f, 1.f, 0.f, 0, false);
 	this->createAnimationComponent(texture_sheet);
 
 	this->animationComponent->addAnimation("MOVING", 5.f, 0, 0, 3, 0, 80, 186);

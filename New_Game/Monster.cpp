@@ -20,7 +20,7 @@ Monster::Monster(float x, float y, sf::Texture& texture_sheet, short type)
 	this->createMovementComponent(150.f, 30.f, 15.f, 100.f, 1, true);
 	this->createAnimationComponent(texture_sheet);
 
-	this->animationComponent->addAnimation("IDLE_LEFT", 20.f, 0, 0, 7, 0, 30, 25);
+	this->animationComponent->addAnimation("IDLE_LEFT", 3.f, 0, 0, 7, 0, 30, 25);
 
 	this->type = type;
 }
@@ -37,7 +37,10 @@ const short& Monster::getType() const
 void Monster::updateAnimation(const float& dt)
 {
 	if (this->movementComponent->getState(IDLE))
+	{
+		this->sprite.setOrigin(0.f, 0.f);
 		this->animationComponent->play("IDLE_LEFT", dt);
+	}
 	else if (this->movementComponent->getState(MOVING_LEFT))
 	{
 		this->sprite.setOrigin(0.f, 0.f);
@@ -46,7 +49,37 @@ void Monster::updateAnimation(const float& dt)
 	}
 	else if (this->movementComponent->getState(MOVING_RIGHT))
 	{
-		this->sprite.setOrigin(30.f, 0.f);
+		this->sprite.setOrigin(24.f, 0.f);
+		this->sprite.setScale(-1.f, 1.f);
+		this->animationComponent->play("IDLE_LEFT", dt);
+	}
+	else if (this->movementComponent->getState(MOVING_UP))
+	{
+		this->animationComponent->play("IDLE_LEFT", dt);
+	}
+	else if (this->movementComponent->getState(MOVING_DOWN))
+	{
+		this->animationComponent->play("IDLE_LEFT", dt);
+	}
+	else if (this->movementComponent->getState(MOVING_UP) && this->movementComponent->getState(MOVING_LEFT))
+	{
+		this->sprite.setOrigin(0.f, 0.f);
+		this->animationComponent->play("IDLE_LEFT", dt);
+	}
+	else if (this->movementComponent->getState(MOVING_UP) && this->movementComponent->getState(MOVING_RIGHT))
+	{
+		this->sprite.setOrigin(24.f, 0.f);
+		this->sprite.setScale(-1.f, 1.f);
+		this->animationComponent->play("IDLE_LEFT", dt);
+	}
+	else if (this->movementComponent->getState(MOVING_DOWN) && this->movementComponent->getState(MOVING_LEFT))
+	{
+		this->sprite.setOrigin(0.f, 0.f);
+		this->animationComponent->play("IDLE_LEFT", dt);
+	}
+	else if (this->movementComponent->getState(MOVING_DOWN) && this->movementComponent->getState(MOVING_RIGHT))
+	{
+		this->sprite.setOrigin(24.f, 0.f);
 		this->sprite.setScale(-1.f, 1.f);
 		this->animationComponent->play("IDLE_LEFT", dt);
 	}
