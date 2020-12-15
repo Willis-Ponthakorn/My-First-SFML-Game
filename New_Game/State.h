@@ -8,6 +8,7 @@
 #include "Boss.h"
 #include "BossBullet.h"
 #include "GameSettings.h"
+#include "Textbox.h"
 
 class Player;
 class Bullet;

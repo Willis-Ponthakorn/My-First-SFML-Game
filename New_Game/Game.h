@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include "MainMenuState.h"
+#include "Textbox.h"
 
 class Game
 {

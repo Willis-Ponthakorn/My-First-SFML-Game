@@ -1,10 +1,12 @@
 #ifndef GAMESTATE_H
 #define GAMESTATE_H
 
+#include "Textbox.h"
 #include "State.h"
 #include "PauseMenu.h"
 #include "TileMap.h"
 
+class StateData;
 class PauseMenu;
 class TileMap;
 class sf::View;
@@ -67,6 +69,8 @@ private:
     sf::Texture texture;
 
     TileMap* tileMap;
+
+    Textbox* playername;
     
     bool bossAttack;
     bool moveBossUp;
@@ -95,6 +99,19 @@ private:
 
     sf::Vector2f checkpointPlayer;
 
+    std::string sname;
+    int sscore;
+
+    int score[6] = {};
+    std::string name[6] = {};
+    char temp[255] = {};
+
+    std::vector <std::pair<int, std::string>> userScore;
+
+    std::FILE* fp;
+
+    bool comp(const std::pair<int, std::string>& a, const std::pair<int, std::string>& b);
+
     void initVariables();
     void initDeferredRender();
     void initView();
@@ -104,6 +121,7 @@ private:
     void initFonts();
     void initText();
     void initTexture();
+    void initTextBox();
     void initPauseMenu();
     void initPlayer();
     void initMonster();
@@ -134,7 +152,9 @@ public:
     void updateBossBullet(const float& dt);
     void updateTileMap(const float& dt);
     void updateBossStage(const float& dt);
+    void updateTextbox();
     void update(const float& dt);
+    void renderTextbox(sf::RenderTarget& target);
     void render(sf::RenderTarget* target = nullptr);
 };
 

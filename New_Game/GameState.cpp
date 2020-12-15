@@ -1,5 +1,11 @@
 #include "stdafx.h"
 #include "GameState.h"
+#define _CRT_SECURE_NO_WARNINGS
+
+bool GameState::comp(const std::pair<int, std::string>& a, const std::pair<int, std::string>& b)
+{
+	return (a.first > b.first);
+}
 
 void GameState::initVariables()
 {
@@ -17,7 +23,7 @@ void GameState::initVariables()
 	this->textPos = 1020.f;
 	this->checkSec = 10;
 	this->getInBossStage = false;
-	this->bossMaxHP = 100.f;
+	this->bossMaxHP = 1.f;
 	this->getWin = false;
 	this->bossAttack = false;
 	this->bulletPosPattern2 = 1510.f;
@@ -225,6 +231,32 @@ void GameState::initTexture()
 	}
 }
 
+void GameState::initTextBox()
+{
+	this->playername = new Textbox(20, sf::Color::White, true, *this->window, this->font);
+
+	this->playername->addButton("QUIT", 520.f, "Enter");
+	this->playername->setPosition(sf::Vector2f(480.f,360.f));
+	this->playername->setlimit(true, 10);
+
+	fp = fopen("Score.txt", "r");
+	for (int i = 0; i < 5; i++)
+	{
+		fscanf(fp, "%s", &temp);
+		name[i] = temp;
+		fscanf(fp, "%d", &score[i]);
+
+		userScore.push_back(make_pair(score[i], name[i]));
+		std::cout << temp << " " << score;
+	}
+	sort(userScore.begin(), userScore.end());
+
+
+	fclose(fp);
+}
+
+
+
 void GameState::initPauseMenu()
 {
 	this->pmenu = new PauseMenu(*this->window, this->font);
@@ -234,8 +266,8 @@ void GameState::initPauseMenu()
 
 void GameState::initPlayer()
 {
-	//this->player = new Player(100, 600, this->textures["PLAYER_SHEET"]);
-	this->player = new Player(10060, 1260, this->textures["PLAYER_SHEET"]);
+	this->player = new Player(100, 600, this->textures["PLAYER_SHEET"]);
+	//this->player = new Player(10060, 1260, this->textures["PLAYER_SHEET"]);
 }
 
 void GameState::initMonster()
@@ -297,6 +329,7 @@ GameState::GameState(StateData* state_data)
 	this->initFonts();
 	this->initText();
 	this->initTexture();
+	this->initTextBox();
 	this->initPauseMenu();
 
 	this->initPlayer();
@@ -308,6 +341,7 @@ GameState::GameState(StateData* state_data)
 
 GameState::~GameState()
 {
+	delete this->playername;
 	delete this->pmenu;
 	delete this->player;
 	delete this->boss;
@@ -367,7 +401,7 @@ void GameState::updatePlayerInput(const float& dt)
 		this->player->move(-1.f, 0.f, dt);
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("MOVE_RIGHT"))))
 		this->player->move(1.f, 0.f, dt);
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("JUMP"))) && this->getKeytime1())
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("C"))) && this->getKeytime1())
 		if (this->player->getCanJump())
 		{
 			this->player->jump();
@@ -377,18 +411,18 @@ void GameState::updatePlayerInput(const float& dt)
 				jump2effect.play();
 		}
 		
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("SHOOT"))) && this->getKeytime2() && this->bullets.size() < 5)
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("X"))) && this->getKeytime2() && this->bullets.size() < 5)
 	{
 		this->shooteffect.play();
 		this->bullets.push_back(new Bullet(this->player->getPosition().x + 36.f, this->player->getPosition().y + 14.f, this->textures["BULLET"]));
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("CHECKPOINT"))) && this->getKeytime3())
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("Z"))) && this->getKeytime3())
 	{
 		this->player->checkpointJumpCount();
 		this->player->stopVelocity();
 		this->player->setPosition(checkpointPlayer.x, checkpointPlayer.y);
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("GOTOSAVE"))) && this->getKeytime3())
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("R"))) && this->getKeytime3())
 	{
 		this->player->setPosition(100.f, 600.f);
 	}
@@ -559,6 +593,7 @@ void GameState::updateBoss(const float& dt)
 			this->bossMusic.stop();
 			this->bossdieeffect.play();
 			this->getWin = true;
+			this->playername->setGetWin(true);
 		}
 		if (!this->bossAttack)
 		{
@@ -823,13 +858,158 @@ void GameState::updateBossStage(const float& dt)
 	}
 }
 
+void GameState::updateTextbox()
+{
+
+	if (this->getWin)
+	{
+		if (this->playername->isButtonPressed("QUIT") && this->getKeytime())
+		{
+			this->nowInMainMenuState();
+			this->sname = this->playername->gettext();
+			if(sname == "\0")
+				this->sname = "Unknown";
+			this->sscore = this->sec;
+
+			userScore.push_back(make_pair(sscore, sname));
+			sort(userScore.begin(), userScore.end());
+
+			fp = fopen("Score.txt", "w");
+			for (int i = 0; i < userScore.size(); i++)
+			{
+
+				strcpy(temp, userScore[i].second.c_str());
+				fprintf(fp, "%s %d\n", temp, userScore[i].first);
+			}
+			fclose(fp);
+			this->endState();
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("A"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(65);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("B"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(66);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("C"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(67);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("D"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(68);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("E"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(69);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("F"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(70);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("G"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(71);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("H"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(72);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("I"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(73);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("J"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(74);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("K"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(75);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("L"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(76);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("M"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(77);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("N"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(78);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("O"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(79);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("P"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(80);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("Q"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(81);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("R"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(82);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("S"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(83);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("T"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(84);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("U"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(85);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("V"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(86);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("W"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(87);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("X"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(88);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("Y"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(89);
+		}
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(this->keybinds.at("Z"))) && this->getKeytime3())
+		{
+			this->playername->typeOn(90);
+		}
+		else if(sf::Keyboard::isKeyPressed(sf::Keyboard::BackSpace) && this->getKeytime3())
+		{
+		this->playername->typeOn(8);
+		}
+	}
+	
+}
+
 void GameState::update(const float& dt)
 {
+	//std::cout << this->getWin << "\n";
 	this->updateMousePosition(&this->view);
 	this->updateKeytime(dt);
 	this->updateInput(dt);
 
-	if (!this->paused)
+	if (this->getWin)
+	{
+		this->playername->update(this->mousePosWindow);
+		this->updateTextbox();
+	}
+
+	else if (!this->paused)
 	{
 		this->updateMusic();
 
@@ -865,6 +1045,11 @@ void GameState::update(const float& dt)
 		this->pmenu->update(this->mousePosWindow);
 		this->updatePauseMenuButtons();
 	}
+}
+
+void GameState::renderTextbox(sf::RenderTarget& target)
+{
+	this->playername->render(target);
 }
 
 void GameState::render(sf::RenderTarget* target)
@@ -916,11 +1101,29 @@ void GameState::render(sf::RenderTarget* target)
 		this->renderTexture.setView(this->renderTexture.getDefaultView());
 		this->pmenu->render(this->renderTexture);
 	}
+	else if (this->getWin)
+	{
+		this->renderTexture.setView(this->renderTexture.getDefaultView());
+		this->playername->render(this->renderTexture);
 
+
+		/*userScore.push_back(std::make_pair(sscore, sname));
+
+		sort(userScore.begin(), userScore.end(), &comp);
+
+		fp = fopen("Score.txt", "w");
+		for (int i = 0; i < 5; i++)
+		{
+			strcpy(temp, userScore[i].second.c_str());
+			fprintf(fp, "%s %d\n", temp, userScore[i].first);
+		}
+		fclose(fp);*/
+	}
 	this->renderTexture.display();
 	this->renderSprite.setTexture(this->renderTexture.getTexture());
 	target->draw(this->renderSprite);
 	target->draw(this->text);
 	if(!this->getWin && this->getInBossStage)
 		target->draw(this->bossHP);
+	
 }

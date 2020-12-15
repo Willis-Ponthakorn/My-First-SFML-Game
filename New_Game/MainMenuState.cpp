@@ -125,7 +125,7 @@ void MainMenuState::updateButtons()
 
 	if (this->buttons["SCOREBOARD_STATE"]->isPressed())
 	{
-		//this->states->push(new SettingState(this->stateData));
+		this->states->push(new HighscoreState(this->stateData));
 	}
 
 	if (this->buttons["EDITOR_STATE"]->isPressed())

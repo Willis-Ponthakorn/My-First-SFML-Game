@@ -3,6 +3,7 @@
 
 #include "GameState.h"
 #include "EditorState.h"
+#include "HighscoreState.h"
 #include "Gui.h"
 
 class MainMenuState :
