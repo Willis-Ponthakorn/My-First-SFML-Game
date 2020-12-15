@@ -25,7 +25,7 @@ private:
 	bool getWin = false;
 	bool isselected = false;
 	bool haslimit = false;
-	int limit;
+	unsigned limit;
 
 	void inputLogic(int chartyped);
 	void deleteLastchar();

@@ -66,21 +66,6 @@ void HighscoreState::initKeybinds()
 
 void HighscoreState::readFile()
 {
-	/*std::ifstream in_file;
-
-	in_file.open("./Score.txt");
-	for (int i = 0; i < 5; i++)
-	{
-		in_file >> score[i] >> name[i];
-
-		userScore.push_back(make_pair(score[i], name[i]));
-		std::cout << temp << " " << score;
-	}
-	sort(userScore.begin(), userScore.end());
-	in_file.close();
-
-	std::cout << userScore.size() << "\n";*/
-
 	fp = fopen("Score.txt", "r");
 	for (int i = 0; i < 5; i++)
 	{
@@ -97,7 +82,7 @@ void HighscoreState::readFile()
 	fclose(fp);
 }
 
-void HighscoreState::showHighScore(int x, int y, std::string word, sf::RenderTarget* target)
+void HighscoreState::showHighScore(float x, float y, std::string word, sf::RenderTarget* target)
 {
 	text.setPosition(x, y);
 	text.setString(word);
@@ -188,7 +173,7 @@ void HighscoreState::render(sf::RenderTarget* target)
 	}
 	fclose(fp);
 
-	showHighScore(340, 110, "HIGHSCORE", target);
+	showHighScore(340.f, 110.f, "HIGHSCORE", target);
 
 	for (int i = 0; i < 5; i++)
 	{
@@ -213,7 +198,7 @@ void HighscoreState::render(sf::RenderTarget* target)
 			str_sec = std::to_string(sec);
 
 		std::string timeScore = str_hour + ":" + str_min + ":" + str_sec;
-		showHighScore(340, 190 + (1 + i) * 60, userScore[i].second, target);
-		showHighScore(600, 190 + (1 + i) * 60, timeScore, target);
+		showHighScore(340.f, 190.f + static_cast<float>(1 + i) * 60.f, userScore[i].second, target);
+		showHighScore(600.f, 190.f + static_cast<float>(1 + i) * 60.f, timeScore, target);
 	}
 }

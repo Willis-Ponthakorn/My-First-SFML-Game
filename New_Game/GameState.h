@@ -91,7 +91,7 @@ private:
     float bossMaxHP;
     float bulletPosPattern2;
     float bulletPosYPattern3;
-    int bulletPattern1;
+    int bulletPattern;
     bool fullBullet;
     std::vector<sf::Vector2f> itemPos;
     std::vector<sf::Clock> itemTime;

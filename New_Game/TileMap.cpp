@@ -58,8 +58,9 @@ TileMap::TileMap(float gridSize, int width, int height, std::string texture_file
 		std::cout << "ERROR::TILEMAP::FAILED TO LOAD TILETEXTURESHEET::FILENAME:" << texture_file << "\n";
 
 	this->collisionBox.setSize(sf::Vector2f(gridSize, gridSize));
-	this->collisionBox.setFillColor(sf::Color(255, 0, 0, 50));
-	this->collisionBox.setOutlineColor(sf::Color::Red);
+	//this->collisionBox.setFillColor(sf::Color(255, 0, 0, 50));
+	this->collisionBox.setFillColor(sf::Color::Transparent);
+	this->collisionBox.setOutlineColor(sf::Color::Transparent);
 	this->collisionBox.setOutlineThickness(-1.f);
 }
 

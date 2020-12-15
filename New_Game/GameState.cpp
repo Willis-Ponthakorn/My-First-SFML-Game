@@ -9,7 +9,7 @@ bool GameState::comp(const std::pair<int, std::string>& a, const std::pair<int, 
 
 void GameState::initVariables()
 {
-	srand(time(NULL));
+	srand(static_cast<unsigned>(time(NULL)));
 	this->camPosX = 0.f;
 	this->camPosY = 0.f;
 	this->mapPosXLeft = 0.f;
@@ -29,7 +29,7 @@ void GameState::initVariables()
 	this->bulletPosPattern2 = 1510.f;
 	this->fullBullet = false;
 	this->pattern = 0;
-	this->bulletPattern1 = 0;
+	this->bulletPattern = 0;
 }
 
 void GameState::initDeferredRender()
@@ -235,7 +235,7 @@ void GameState::initTextBox()
 {
 	this->playername = new Textbox(20, sf::Color::White, true, *this->window, this->font);
 
-	this->playername->addButton("QUIT", 520.f, "Enter");
+	this->playername->addButton("ENTER", 520.f, "Enter");
 	this->playername->setPosition(sf::Vector2f(480.f,360.f));
 	this->playername->setlimit(true, 10);
 
@@ -266,8 +266,8 @@ void GameState::initPauseMenu()
 
 void GameState::initPlayer()
 {
-	//this->player = new Player(100, 600, this->textures["PLAYER_SHEET"]);
-	this->player = new Player(10060, 1260, this->textures["PLAYER_SHEET"]);
+	this->player = new Player(100, 600, this->textures["PLAYER_SHEET"]);
+	//this->player = new Player(10060, 1260, this->textures["PLAYER_SHEET"]);
 }
 
 void GameState::initMonster()
@@ -432,7 +432,7 @@ void GameState::updateTime()
 {
 	this->gameTime = this->clock.getElapsedTime();
 	//std::cout << this->gameTime.asSeconds() << "\n";
-	this->sec = this->gameTime.asSeconds();
+	this->sec = static_cast<int>(this->gameTime.asSeconds());
 	this->text.setString(std::to_string(this->sec));
 	if (this->sec == this->checkSec)
 	{
@@ -611,18 +611,18 @@ void GameState::updateBossAttackPattern1(const float& dt)
 {
 	std::cout << "PATTERN1" << "\n";
 	sf::Time bossDelayElapsed = bossDelay.getElapsedTime();
-	if (bossDelayElapsed.asSeconds() >= 0.5f && this->bossBullets.size() < 8 && !this->fullBullet && this->bulletPattern1 < 8)
+	if (bossDelayElapsed.asSeconds() >= 0.5f && this->bossBullets.size() < 8 && !this->fullBullet && this->bulletPattern < 8)
 	{
-		this->bossBullets.push_back(new BossBullet(770.f, static_cast<float>(rand() % 720) + this->mapPosYUp, this->textures["BOSS_BULLET"], static_cast<float>(rand() % 4) + 1));
-		this->bulletPattern1++;
+		this->bossBullets.push_back(new BossBullet(770.f, static_cast<float>(rand() % 720) + this->mapPosYUp, this->textures["BOSS_BULLET"], static_cast<short>(rand() % 4) + 1));
+		this->bulletPattern++;
 		this->bossDelay.restart();
 	}
 	else if (this->bossBullets.size() >= 8)
 		this->fullBullet = true;
 
-	if (this->bulletPattern1 >= 8 && this->bossBullets.size() == 0)
+	if (this->bulletPattern >= 8 && this->bossBullets.size() == 0)
 	{
-		this->bulletPattern1 = 0;
+		this->bulletPattern = 0;
 		this->bossAttack = false;
 		this->fullBullet = false;
 		this->pattern = 0;
@@ -638,14 +638,14 @@ void GameState::updateBossAttackPattern2(const float& dt)
 		this->bossBullets.push_back(new BossBullet(770.f, this->bulletPosYPattern3, this->textures["BOSS_BULLET"], 4));
 		this->bossBullets.push_back(new BossBullet(770.f, this->bulletPosYPattern3 + 38.f, this->textures["BOSS_BULLET"], 4));
 		this->bossBullets.push_back(new BossBullet(770.f, this->bulletPosYPattern3 + 76.f, this->textures["BOSS_BULLET"], 4));
-		this->bulletPattern1 += 3;
+		this->bulletPattern += 3;
 	}
 	else if (this->bossBullets.size() >= 3)
 		this->fullBullet = true;
 
-	if (this->bulletPattern1 >= 3 && this->bossBullets.size() == 0)
+	if (this->bulletPattern >= 3 && this->bossBullets.size() == 0)
 	{
-		this->bulletPattern1 = 0;
+		this->bulletPattern = 0;
 		this->bossAttack = false;
 		this->fullBullet = false;
 		this->pattern = 0;
@@ -654,15 +654,15 @@ void GameState::updateBossAttackPattern2(const float& dt)
 
 void GameState::updateBossAttackPattern3(const float& dt)
 {
-	std::cout << "PATTERN3" << "\n";
+	//std::cout << "PATTERN3" << "\n";
 	sf::Time bossDelayElapsed = bossDelay.getElapsedTime();
-	if (bossDelayElapsed.asSeconds() >= 1.f && this->bossBullets.size() < 4 && !this->fullBullet && this->bulletPattern1 < 4)
+	if (bossDelayElapsed.asSeconds() >= 1.f && this->bossBullets.size() < 4 && !this->fullBullet && this->bulletPattern < 4)
 	{
 		this->bossBullets.push_back(new BossBullet(770.f, this->bulletPosPattern2, this->textures["BOSS_BULLET"], 2));
 		this->playerPos.push_back(sf::Vector2f(this->player->getPosition()));
 		this->bossDelay.restart();
 		this->bulletPosPattern2 += 147.5f;
-		this->bulletPattern1++;
+		this->bulletPattern++;
 	}
 	else if (this->bulletPosPattern2 >= 2100.f)
 	{
@@ -670,9 +670,9 @@ void GameState::updateBossAttackPattern3(const float& dt)
 		this->fullBullet = true;
 	}
 
-	if (this->bulletPattern1 >= 4 && this->bossBullets.size() == 0)
+	if (this->bulletPattern >= 4 && this->bossBullets.size() == 0)
 	{
-		this->bulletPattern1 = 0;
+		this->bulletPattern = 0;
 		this->bossAttack = false;
 		this->fullBullet = false;
 		this->pattern = 0;
@@ -863,7 +863,7 @@ void GameState::updateTextbox()
 
 	if (this->getWin)
 	{
-		if (this->playername->isButtonPressed("QUIT") && this->getKeytime())
+		if (this->playername->isButtonPressed("ENTER") && this->getKeytime())
 		{
 			this->nowInMainMenuState();
 			this->sname = this->playername->gettext();
@@ -877,7 +877,7 @@ void GameState::updateTextbox()
 			sort(userScore.begin(), userScore.end());
 
 			fp = fopen("Score.txt", "w");
-			for (int i = 0; i < userScore.size(); i++)
+			for (unsigned i = 0; i < userScore.size(); i++)
 			{
 
 				strcpy(temp, userScore[i].second.c_str());

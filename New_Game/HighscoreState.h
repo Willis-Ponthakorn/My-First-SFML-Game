@@ -53,7 +53,7 @@ private:
     void initText();
     void initKeybinds();
     void readFile();
-    void showHighScore(int x, int y, std::string word, sf::RenderTarget* target);
+    void showHighScore(float x, float y, std::string word, sf::RenderTarget* target);
 
 public:
     HighscoreState(StateData* state_data);

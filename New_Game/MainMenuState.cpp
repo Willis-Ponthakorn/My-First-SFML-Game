@@ -4,6 +4,7 @@
 void MainMenuState::initVariables()
 {
 	this->inMainMenuState = true;
+	this->toggleEditor = false;
 }
 
 void MainMenuState::initSound()
@@ -25,7 +26,7 @@ void MainMenuState::initBackground()
 		)
 	);
 
-	if (!this->bgTexture.loadFromFile("res/image/gameBackground2.png"))
+	if (!this->bgTexture.loadFromFile("res/image/gameBackground3.png"))
 	{
 		throw "ERROR::MAINMENUSTATE::FAILED_TO_LOAD_BACKGROUND_TEXTURE";
 	}
@@ -70,9 +71,9 @@ void MainMenuState::initButtons()
 		&this->font, "Scoreboard", 20,
 		sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 255), sf::Color(20, 20, 20, 200));
 
-	this->buttons["EDITOR_STATE"] = new gui::Button(465.f, 470.f, 150.f, 50.f,
+	/*this->buttons["EDITOR_STATE"] = new gui::Button(465.f, 470.f, 150.f, 50.f,
 		&this->font, "Editor", 20,
-		sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 255), sf::Color(20, 20, 20, 200));
+		sf::Color(70, 70, 70, 200), sf::Color(150, 150, 150, 255), sf::Color(20, 20, 20, 200));*/
 
 	this->buttons["EXIT_STATE"] = new gui::Button(465.f, 570.f, 150.f, 50.f,
 		&this->font, "Leave", 20,
@@ -106,7 +107,6 @@ const bool MainMenuState::getInMainMenuState() const
 
 void MainMenuState::updateInput(const float& dt)
 {
-	
 }
 
 void MainMenuState::updateButtons()
@@ -128,12 +128,12 @@ void MainMenuState::updateButtons()
 		this->states->push(new HighscoreState(this->stateData));
 	}
 
-	if (this->buttons["EDITOR_STATE"]->isPressed())
+	/*if (this->buttons["EDITOR_STATE"]->isPressed() && this->toggleEditor)
 	{
 		this->music.stop();
 		this->nowOutMainMenuState();
 		this->states->push(new EditorState(this->stateData));
-	}
+	}*/
 
 	if (this->buttons["EXIT_STATE"]->isPressed())
 	{
@@ -168,15 +168,5 @@ void MainMenuState::render(sf::RenderTarget* target)
 	target->draw(this->background);
 
 	this->renderButtons(*target);
-
-	/*sf::Text mouseText;
-	mouseText.setPosition(this->mousePosView.x, this->mousePosView.y - 50);
-	mouseText.setFont(this->font);
-	mouseText.setCharacterSize(12);
-	std::stringstream ss;
-	ss << this->mousePosView.x << " " << this->mousePosView.y;
-	mouseText.setString(ss.str());
-
-	target->draw(mouseText);*/
 }
 

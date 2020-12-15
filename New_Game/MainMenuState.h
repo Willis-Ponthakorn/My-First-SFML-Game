@@ -19,6 +19,7 @@ private:
     sf::Music music;
 
     bool inMainMenuState;
+    bool toggleEditor;
 
     void initVariables();
     void initSound();

@@ -113,7 +113,7 @@ void Textbox::setSelected(bool sel)
 	if (!sel) {
 		std::string t = text.str();
 		std::string newT = "";
-		for (int i = 0; i < t.length() - 1; i++) {
+		for (unsigned i = 0; i < t.length() - 1; i++) {
 			newT += t[i];
 		}
 		this->textbox.setString(newT);
@@ -183,7 +183,7 @@ void Textbox::deleteLastchar()
 {
 	std::string t = text.str();
 	std::string newT = "";
-	for (int i = 0; i < t.length() - 1; i++) {
+	for (unsigned i = 0; i < t.length() - 1; i++) {
 		newT += t[i];
 	}
 	this->text.str("");
