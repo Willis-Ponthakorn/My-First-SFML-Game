@@ -23,6 +23,7 @@ private:
 
     sf::Texture bgTexture;
     sf::RectangleShape background;
+    sf::RectangleShape container;
 
     sf::Font font;
 
@@ -38,6 +39,10 @@ private:
     std::vector <std::pair<int, std::string>> userScore;
 
     std::FILE* fp;
+
+    std::string str_hour;
+    std::string str_min;
+    std::string str_sec;
 
     bool comp(const std::pair<int, std::string>& a, const std::pair<int, std::string>& b);
 

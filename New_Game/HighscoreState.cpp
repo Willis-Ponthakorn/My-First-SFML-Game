@@ -23,6 +23,14 @@ void HighscoreState::initBackground()
 		)
 	);
 
+	this->container.setSize(
+		sf::Vector2f(
+			static_cast<float>(this->window->getSize().x),
+			static_cast<float>(this->window->getSize().y)
+		)
+	);
+	this->container.setFillColor(sf::Color(20, 20, 20, 100));
+
 	if (!this->bgTexture.loadFromFile("res/image/gameBackground.png"))
 	{
 		throw "ERROR::MAINMENUSTATE::FAILED_TO_LOAD_BACKGROUND_TEXTURE";
@@ -94,7 +102,7 @@ void HighscoreState::showHighScore(int x, int y, std::string word, sf::RenderTar
 	text.setPosition(x, y);
 	text.setString(word);
 	if (word == "HIGHSCORE")
-		text.setCharacterSize(60);
+		text.setCharacterSize(80);
 	else
 		text.setCharacterSize(30);
 
@@ -167,6 +175,8 @@ void HighscoreState::render(sf::RenderTarget* target)
 
 	target->draw(this->background);
 
+	target->draw(this->container);
+
 	this->renderButtons(*target);
 
 	fp = fopen("Score.txt", "w");
@@ -178,11 +188,32 @@ void HighscoreState::render(sf::RenderTarget* target)
 	}
 	fclose(fp);
 
-	showHighScore(375, 130, "HIGHSCORE", target);
+	showHighScore(340, 110, "HIGHSCORE", target);
 
 	for (int i = 0; i < 5; i++)
 	{
-		showHighScore(400, 190 + (1 + i) * 60, userScore[i].second, target);
-		showHighScore(600, 190 + (1 + i) * 60, std::to_string(userScore[i].first), target);
+		int temp = userScore[i].first;
+		int sec = temp % 60;
+		temp /= 60;
+		int minute = temp % 60;
+		int hour = temp / 60;
+		if (hour < 10)
+			str_hour = "0" + std::to_string(hour);
+		else
+			str_hour = std::to_string(hour);
+
+		if (minute < 10)
+			str_min = "0" + std::to_string(minute);
+		else
+			str_min = std::to_string(minute);
+
+		if (sec < 10)
+			str_sec = "0" + std::to_string(sec);
+		else
+			str_sec = std::to_string(sec);
+
+		std::string timeScore = str_hour + ":" + str_min + ":" + str_sec;
+		showHighScore(340, 190 + (1 + i) * 60, userScore[i].second, target);
+		showHighScore(600, 190 + (1 + i) * 60, timeScore, target);
 	}
 }

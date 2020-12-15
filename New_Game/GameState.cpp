@@ -23,7 +23,7 @@ void GameState::initVariables()
 	this->textPos = 1020.f;
 	this->checkSec = 10;
 	this->getInBossStage = false;
-	this->bossMaxHP = 1.f;
+	this->bossMaxHP = 100.f;
 	this->getWin = false;
 	this->bossAttack = false;
 	this->bulletPosPattern2 = 1510.f;
@@ -266,8 +266,8 @@ void GameState::initPauseMenu()
 
 void GameState::initPlayer()
 {
-	this->player = new Player(100, 600, this->textures["PLAYER_SHEET"]);
-	//this->player = new Player(10060, 1260, this->textures["PLAYER_SHEET"]);
+	//this->player = new Player(100, 600, this->textures["PLAYER_SHEET"]);
+	this->player = new Player(10060, 1260, this->textures["PLAYER_SHEET"]);
 }
 
 void GameState::initMonster()
@@ -870,6 +870,8 @@ void GameState::updateTextbox()
 			if(sname == "\0")
 				this->sname = "Unknown";
 			this->sscore = this->sec;
+			if (sscore == 0)
+				this->sscore = 999999;
 
 			userScore.push_back(make_pair(sscore, sname));
 			sort(userScore.begin(), userScore.end());
