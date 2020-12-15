@@ -794,6 +794,7 @@ void GameState::updateBossBullet(const float& dt)
 			this->player->checkpointJumpCount();
 			this->player->stopVelocity();
 			this->player->setPosition(checkpointPlayer.x, checkpointPlayer.y);
+			this->bossMaxHP = 100.f;
 			this->getInBossStage = false;
 		}
 
